@@ -1,0 +1,45 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum CustomerEnum {
+  ACTIVE
+  INACTIVE
+  DELETED
+}
+
+model CustomerEntity {
+  id                  String                    @id @db.Uuid
+  organizationName    String                    @map("organization_name")
+  slug                String                    @unique
+  status              CustomerEnum             @default(ACTIVE)
+  locale              String
+  createdAtUtc        DateTime?                 @map("created_at_utc")
+  updatedAtUtc        DateTime?                 @map("updated_at_utc")
+  address         AddressEntity?
+
+  @@map("customers")
+}
+
+model AddressEntity {
+  id           String         @id @db.Uuid
+  country      String
+  state        String?
+  postalCode   String         @map("postal_code")
+  city         String
+  address     String
+  createdAtUtc DateTime?      @map("created_at_utc")
+  updatedAtUtc DateTime?      @map("updated_at_utc")
+  customer     CustomerEntity @relation(fields: [customerId], references: [id])
+  customerId   String         @unique @map("customer_id")
+
+  @@map("customers_addresses")
+}
