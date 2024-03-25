@@ -10,7 +10,7 @@ Ideally this will enable people to checkout the repo to their machine, configure
 ## On the shoulders of giants
 
 The idea for this project stemmed from the fact that I could not find a relevant existing benchmark.
-I found a theoretically very good benchmark for this at this Repo by (TODO link). The problem here is, that the last update was 4 years ago - in the meantime new frameworks showed up and others got significant updates. 
+I found a theoretically very good benchmark for this at this [repository](https://github.com/emanuelcasco/typescript-orm-benchmark) by (Emanuel Casco). The problem here is, that the last update was 4 years ago - in the meantime new frameworks showed up and others got significant updates. 
 So building on inspiration from the methodology and comparisons there, I decided to start fresh.
 
 ## Methodology and Data used
@@ -69,8 +69,6 @@ pnpm drizzle-push
 to generate and apply the database migration scripts to your DB with the drizzle-kit cli
 
 Configure your sizes in the .env file of your repo. The following keys are used:
-* (TODO insert keys of environment configs here with explanation)
-
 * ORDER_AMOUNT_FACTOR - max number of orders per customer
 * ORDERED_PARTS_FACTOR - max number of ordered parts per order
 * MARKETING_CAMPAIGN_DIVISOR - how many marketing campaigns when compared to number of customers
