@@ -22,7 +22,7 @@ export class OrderDrizzleRepository {
     private readonly benchmarkService: BenchmarkMetricsService,
     private readonly configService: ConfigService,
     private readonly loggerService: LoggerService,
-  ) { }
+  ) {}
 
   async upsertManyOrdersFromCustomersAsChunks(
     customers: CustomerEntity[],

@@ -19,7 +19,7 @@ export class CustomerDrizzleRepository {
     private readonly drizzle: NodePgDatabase<typeof customersSchema>,
     private readonly benchmarkService: BenchmarkMetricsService,
     private readonly configService: ConfigService,
-  ) { }
+  ) {}
 
   async upsertCustomer(customer: CustomerEntity): Promise<CustomerEntity> {
     return (await this.drizzle

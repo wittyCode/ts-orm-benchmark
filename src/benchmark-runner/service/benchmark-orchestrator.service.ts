@@ -30,7 +30,7 @@ export class BenchmarkOrchestratorService {
     private readonly orderDrizzleRepository: OrderDrizzleRepository,
     private readonly billDrizzleRepository: BillsDrizzleRepository,
     private readonly loggerService: LoggerService,
-  ) { }
+  ) {}
 
   async resetBenchmark(): Promise<void> {
     this.loggerService.log('Resetting benchmark');
