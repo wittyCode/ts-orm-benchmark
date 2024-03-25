@@ -5,7 +5,7 @@ import { MarketingCampaignEntity } from '../../benchmark-data/model/marketing-ca
 
 @Injectable()
 export class MarketingCampaignFakerService {
-  constructor() { }
+  constructor() {}
 
   createMockMarketingCampaigns(maxAmount: number): MarketingCampaignEntity[] {
     const amount = faker.number.int({ min: 1, max: maxAmount });

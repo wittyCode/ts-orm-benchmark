@@ -6,6 +6,8 @@ import { MockCreatorModule } from '../mock-creator/mock-creator.module';
 import { BenchmarkMetricsModule } from '../benchmark-metrics/benchmark-metrics.module';
 import { DrizzleModule } from '../drizzle/drizzle.module';
 import { BenchmarkDataModule } from '../benchmark-data/benchmark-data.module';
+import { DrizzleReadBenchmarkService } from './service/drizzle.read-benchmark.service';
+import { DrizzleWriteBenchmarkService } from './service/drizzle.write-benchmark.service';
 
 /**
  * Benchmark runner module with controller that provides endpoints to run specifically configured benchmarks.
@@ -20,7 +22,11 @@ import { BenchmarkDataModule } from '../benchmark-data/benchmark-data.module';
     BenchmarkDataModule,
     DrizzleModule,
   ],
-  providers: [BenchmarkOrchestratorService],
+  providers: [
+    BenchmarkOrchestratorService,
+    DrizzleReadBenchmarkService,
+    DrizzleWriteBenchmarkService,
+  ],
   controllers: [BenchmarkRunnerController],
 })
 export class BenchmarkRunnerModule {}
