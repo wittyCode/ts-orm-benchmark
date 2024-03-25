@@ -1,15 +1,11 @@
 import { faker } from '@faker-js/faker';
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { v4 as uuid } from 'uuid';
 import { MarketingCampaignEntity } from '../../benchmark-data/model/marketing-campaign.entity';
 
-// TODO: this needs to move to benchmark runner service
-export const marketingCampaignDivisorKey = 'MARKETING_CAMPAIGN_DIVISOR';
-
 @Injectable()
 export class MarketingCampaignFakerService {
-  constructor(private readonly configService: ConfigService) {}
+  constructor() { }
 
   createMockMarketingCampaigns(maxAmount: number): MarketingCampaignEntity[] {
     const amount = faker.number.int({ min: 1, max: maxAmount });
