@@ -10,7 +10,7 @@ Ideally this will enable people to checkout the repo to their machine, configure
 ## On the shoulders of giants
 
 The idea for this project stemmed from the fact that I could not find a relevant existing benchmark.
-I found a theoretically very good benchmark for this at this [repository](https://github.com/emanuelcasco/typescript-orm-benchmark) by (Emanuel Casco). The problem here is, that the last update was 4 years ago - in the meantime new frameworks showed up and others got significant updates. 
+I found a theoretically very good benchmark for this in this [repository](https://github.com/emanuelcasco/typescript-orm-benchmark) by Emanuel Casco. The problem here is, that the last update was 4 years ago - in the meantime new frameworks showed up and others got significant updates. 
 So building on inspiration from the methodology and comparisons there, I decided to start fresh.
 
 ## Methodology and Data used
@@ -21,7 +21,7 @@ To be able to compare the different libraries, we will use the following assumpt
 2. In the current iteration we will look into simple use-cases like uuids as primary key and indices only on foreign keys - in a future iteration composite indices or keys could be interesting to explore as well since that will impact insert performance
 3. We want a dataset that's sufficiently big, ideally with entities in the millions.
 4. We randomize the size of collections of child-entities a bit, to not just have uniform data insertion - since in real production use-cases different sizes of datasets are to be expected.
-5. Statistics and the law of large numbers (TODO link) will ensure that we have a normal distribution for entity count so that we can still compare between sufficiently large benchmarks
+5. Statistics and the [Law of Large Numbers](https://en.wikipedia.org/wiki/Law_of_large_numbers) will ensure that we have a normal distribution for entity count so that we can still compare between sufficiently large benchmarks
 6. We're interested in insertion performance, performance of selecting big datasets and of updating selected colums for big datasets in bulk
 7. All data can be easily deleted to also be able to measure bulk deletions
 

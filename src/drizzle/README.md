@@ -8,9 +8,6 @@ Install drizzle-orm with the following command:
 pnpm install drizzle-orm
 ```
 
-View the custom provider setup in the [DrizzleProvider](./repository/customer/drizzle.customer.repository.provider.ts)
-file.
-
 Tables are defined in the schemas file in the schema directory.
 These schemas must then be used as param in the provider so they are accessible in the application at runtime.
 For implementation of inserts and queries, see the Repository implementations in the repository directory.
@@ -43,6 +40,6 @@ an abstraction from the concrete ORM used. Using the _as_ type assertion helps, 
 where I had to cast to unknown first - maybe there's an easier way, if there is, please tell me!
 
 After the learning curve writing drizzle is actually quite satisfying due to the ability to stay as close to SQL as
-possible and therefore automatically learning more about SQL. Somehow only the one-to-many syntax is a bit weird to me, and I always needed to look it up. But maybe that's just me.
+possible and therefore automatically learning more about SQL. Somehow only the relations syntax is a bit weird to me, and I always needed to look it up. But maybe that's just me - and when you're used to it, it should definitely become more easy.
 
-I did not find a simple way to update multiple entities in a single transaction, so I had to use a loop. This obviously leads to terrible performance, since every update is a separate query. I hope I just missed something and there is a better way to do this. Might go to the discord and ask the drizzle devs later.
+I did not find a simple way to update multiple entities in a single transaction, but a few days ago on the official Drizzle docs a workaround/fix was provided by using [Upserts](https://orm.drizzle.team/learn/guides/upsert)
