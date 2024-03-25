@@ -9,6 +9,9 @@ import { OrderEntity } from '../../benchmark-data/model/order.entity';
 import { OrderDrizzleRepository } from '../../drizzle/repository/orders/order.drizzle.repository';
 import { BillsDrizzleRepository } from '../../drizzle/repository/bills/bills.drizzle.repository';
 import { BillEntity } from '../../benchmark-data/model/bill.entity';
+import { ConfigService } from '@nestjs/config';
+import { MarketingCampaignsDrizzleRepository } from '../../drizzle/repository/marketing-campaigns/marketing-campaigns.drizzle.repository';
+import { MarketingCampaignEntity } from '../../benchmark-data/model/marketing-campaign.entity';
 
 export enum BenchmarkType {
   DRIZZLE = 'drizzle',
@@ -21,6 +24,8 @@ export enum BenchmarkType {
   SEQUELIZE = 'sequelize',
 }
 
+export const marketingCampaignDivisorKey = 'MARKETING_CAMPAIGN_DIVISOR';
+
 @Injectable()
 export class BenchmarkOrchestratorService {
   constructor(
@@ -29,7 +34,9 @@ export class BenchmarkOrchestratorService {
     private readonly customerDrizzleRepository: CustomerDrizzleRepository,
     private readonly orderDrizzleRepository: OrderDrizzleRepository,
     private readonly billDrizzleRepository: BillsDrizzleRepository,
+    private readonly marketingCampaignsDrizzleRepository: MarketingCampaignsDrizzleRepository,
     private readonly loggerService: LoggerService,
+    private readonly configService: ConfigService,
   ) {}
 
   async resetBenchmark(): Promise<void> {
@@ -37,6 +44,7 @@ export class BenchmarkOrchestratorService {
     // FK cascading deletes will delete addresses, orders as well
     await this.customerDrizzleRepository.drop();
     await this.billDrizzleRepository.drop();
+    await this.marketingCampaignsDrizzleRepository.drop();
     this.benchmarkService.resultMap.clear();
   }
 
@@ -72,11 +80,26 @@ export class BenchmarkOrchestratorService {
       customerEntities.map((it) => it.id),
     );
 
+    const marketingCampaignDivisor =
+      parseInt(this.configService.get<string>(marketingCampaignDivisorKey)) ||
+      100;
+    const marketingCampaignCount = Math.ceil(
+      customerSize / marketingCampaignDivisor,
+    );
+    this.loggerService.log(
+      `Creating ${marketingCampaignCount} fake marketing campaigns`,
+    );
+    const marketingCampaignEntities =
+      await this.createMockService.createMockMarketingCampaigns(
+        marketingCampaignCount,
+      );
+
     const sumOfAll =
       customerEntities.length +
       orderCount +
       orderedPartsFlatCount +
-      billEntities.length;
+      billEntities.length +
+      marketingCampaignCount;
 
     this.loggerService.log(
       `
@@ -85,6 +108,7 @@ export class BenchmarkOrchestratorService {
       ${orderCount} order entities created!
       ${orderedPartsFlatCount} ordered part data entries created!
       ${billEntities.length} bill entities created!
+      ${marketingCampaignCount} marketing campaign entities created!
       `,
     );
 
@@ -135,6 +159,15 @@ export class BenchmarkOrchestratorService {
     );
 
     // 5. insert marketing campaigns
+    this.loggerService.log('Inserting marketing campaigns');
+    await benchmark(
+      'insertAllMarketingCampaigns',
+      this.marketingCampaignsDrizzleRepository.upsertManyMarketingCampaigns.bind(
+        this.marketingCampaignsDrizzleRepository,
+      ),
+      this.benchmarkService.resultMap,
+      marketingCampaignEntities,
+    );
 
     // 6. insert jointable marketing campaing <-> customers
 
@@ -190,6 +223,17 @@ export class BenchmarkOrchestratorService {
     this.loggerService.log(`Found ${bills.length} bills`);
 
     // 5. find all marketing campaigns
+    this.loggerService.log('Reading marketing campaigns');
+    const marketingCampaigns = await benchmark<MarketingCampaignEntity[]>(
+      'findAllMarketingCampaigns',
+      this.marketingCampaignsDrizzleRepository.findAll.bind(
+        this.marketingCampaignsDrizzleRepository,
+      ),
+      this.benchmarkService.resultMap,
+    );
+    this.loggerService.log(
+      `Found ${marketingCampaigns.length} marketing campaigns`,
+    );
 
     const duration = performance.now() - startTime;
     this.loggerService.log(

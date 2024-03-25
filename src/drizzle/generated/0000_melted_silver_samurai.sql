@@ -32,6 +32,15 @@ CREATE TABLE IF NOT EXISTS "customers" (
 	"updated_at_utc" timestamp DEFAULT (now() at time zone 'utc') NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "marketing_campaigns" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"name" text NOT NULL,
+	"start_date" timestamp NOT NULL,
+	"end_date" timestamp,
+	"created_at_utc" timestamp DEFAULT (now() at time zone 'utc') NOT NULL,
+	"updated_at_utc" timestamp DEFAULT (now() at time zone 'utc') NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "ordered_parts" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" text NOT NULL,

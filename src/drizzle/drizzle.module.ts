@@ -5,6 +5,7 @@ import { CustomerDrizzleRepository } from './repository/customer/customer.drizzl
 import { OrderDrizzleRepository } from './repository/orders/order.drizzle.repository';
 import { LoggerModule } from '../logger/logger.module';
 import { BillsDrizzleRepository } from './repository/bills/bills.drizzle.repository';
+import { MarketingCampaignsDrizzleRepository } from './repository/marketing-campaigns/marketing-campaigns.drizzle.repository';
 
 /**
  * Module for the drizzle ORM. Contains the providers for the drizzle ORM and
@@ -18,12 +19,14 @@ import { BillsDrizzleRepository } from './repository/bills/bills.drizzle.reposit
     CustomerDrizzleRepository,
     OrderDrizzleRepository,
     BillsDrizzleRepository,
+    MarketingCampaignsDrizzleRepository,
   ],
   exports: [
     ...drizzleProvider,
     CustomerDrizzleRepository,
     OrderDrizzleRepository,
     BillsDrizzleRepository,
+    MarketingCampaignsDrizzleRepository,
   ],
 })
 export class DrizzleModule {}

@@ -6,15 +6,33 @@ import { LoggerService } from '../../logger/logger.service';
 import { BenchmarkMetricsService } from '../../benchmark-metrics/service/benchmark-metrics.service';
 import { BillEntity } from '../../benchmark-data/model/bill.entity';
 import { BillsFakerService } from './bills-faker.service';
+import { MarketingCampaignEntity } from '../../benchmark-data/model/marketing-campaign.entity';
+import { MarketingCampaignFakerService } from './marketing-campaign-faker.service';
 
 @Injectable()
 export class CreateMockService {
   constructor(
     private readonly customerFakerService: CustomerFakerService,
     private readonly billFakerService: BillsFakerService,
+    private readonly marketingCampaignFakerService: MarketingCampaignFakerService,
     private readonly loggerService: LoggerService,
     private readonly benchmarkService: BenchmarkMetricsService,
   ) {}
+
+  async createMockMarketingCampaigns(amount: number) {
+    const entities = await benchmark<MarketingCampaignEntity[]>(
+      `Create ${amount} mock campaign entities`,
+      this.marketingCampaignFakerService.createMockMarketingCampaigns.bind(
+        this.marketingCampaignFakerService,
+      ),
+      this.benchmarkService.resultMap,
+      amount,
+    );
+    this.loggerService.log(
+      `${entities.length} mock marketing campaign entities created`,
+    );
+    return entities;
+  }
 
   async createMockBills(amount: number, customerIds: string[]) {
     const entities = await benchmark<BillEntity[]>(

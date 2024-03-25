@@ -25,7 +25,7 @@ To be able to compare the different libraries, we will use the following assumpt
 6. We're interested in insertion performance, performance of selecting big datasets and of updating selected colums for big datasets in bulk
 7. All data can be easily deleted to also be able to measure bulk deletions
 
-A simple syntethic use-case to achieve our goals is the following:
+A simple synthetic use-case to achieve our goals is the following:
 * We own an online store that sells parts for an industry that regularly needs to re-order (e.g. for car mechanics)
 * The main parent entity in our shop is the customer. A customer has address details assigned in a 1:1-relation
 * Every customer has many Orders (1-n relation) and a bill for each order (1-n from customer to bill)

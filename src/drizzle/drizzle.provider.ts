@@ -5,6 +5,7 @@ import * as addressSchema from './schema/address';
 import * as ordersSchema from './schema/orders';
 import * as orderedPartsSchema from './schema/ordered-parts';
 import * as billsSchema from './schema/bills';
+import * as campaignsSchema from './schema/marketing-campaigns';
 
 /**
  * ensure the drizzle module can be injected into other modules
@@ -30,6 +31,7 @@ export const drizzleProvider = [
           ...ordersSchema,
           ...orderedPartsSchema,
           ...billsSchema,
+          ...campaignsSchema,
         },
       });
     },
