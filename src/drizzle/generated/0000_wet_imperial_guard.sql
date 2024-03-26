@@ -32,6 +32,12 @@ CREATE TABLE IF NOT EXISTS "customers" (
 	"updated_at_utc" timestamp DEFAULT (now() at time zone 'utc') NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "marketing_campaigns_on_customers" (
+	"marketing_campaign_id" uuid NOT NULL,
+	"customer_id" uuid NOT NULL,
+	CONSTRAINT "marketing_campaigns_on_customers_customer_id_marketing_campaign_id_pk" PRIMARY KEY("customer_id","marketing_campaign_id")
+);
+--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "marketing_campaigns" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" text NOT NULL,
@@ -69,6 +75,18 @@ CREATE INDEX IF NOT EXISTS "ordered_parts_bill_index" ON "ordered_parts" ("bill_
 CREATE INDEX IF NOT EXISTS "orders_customer_id_index" ON "orders" ("customer_id");--> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "customers_address" ADD CONSTRAINT "customers_address_customer_id_customers_id_fk" FOREIGN KEY ("customer_id") REFERENCES "customers"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "marketing_campaigns_on_customers" ADD CONSTRAINT "marketing_campaigns_on_customers_marketing_campaign_id_marketing_campaigns_id_fk" FOREIGN KEY ("marketing_campaign_id") REFERENCES "marketing_campaigns"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "marketing_campaigns_on_customers" ADD CONSTRAINT "marketing_campaigns_on_customers_customer_id_customers_id_fk" FOREIGN KEY ("customer_id") REFERENCES "customers"("id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

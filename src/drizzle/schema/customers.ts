@@ -11,6 +11,7 @@ import { CustomerStatusEnum } from '../../benchmark-data/model/customer.enums';
 import { defaultUtcNow } from './helpers';
 import * as ordersSchema from './orders';
 import * as adressSchema from './address';
+import * as marketingCampaignsOnCustomersSchema from './marketing-campaigns-on-customers';
 import { bills } from './bills';
 
 // define as pgEnum for use in schema
@@ -39,10 +40,17 @@ export const customers = pgTable(
     };
   },
 );
-
-export const customerOrders = relations(customers, ({ many }) => ({
+// TODO: collect all relations in this block instead of having separate blocks! (big learning if this works)
+// TODO: look through videos of sakura dev again to check if relations can be simplified!
+export const customerRelations = relations(customers, ({ many }) => ({
   customersOrders: many(ordersSchema.orders, {
     relationName: 'customers_orders',
+  }),
+  marketingCampaigns: many(
+    marketingCampaignsOnCustomersSchema.marketingCampaignsOnCustomers,
+  ),
+  bills: many(bills, {
+    relationName: 'bill_to_customer',
   }),
 }));
 
@@ -53,11 +61,5 @@ export const customerAddressRelation = relations(customers, ({ one }) => ({
     fields: [customers.id],
     references: [adressSchema.customerAddress.customerId],
     relationName: 'customers_address_relation',
-  }),
-}));
-
-export const customerToBillsRelation = relations(customers, ({ many }) => ({
-  bills: many(bills, {
-    relationName: 'bill_to_customer',
   }),
 }));

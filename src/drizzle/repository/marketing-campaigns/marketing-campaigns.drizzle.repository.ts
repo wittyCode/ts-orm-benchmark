@@ -45,9 +45,11 @@ export class MarketingCampaignsDrizzleRepository {
   }
 
   async findAll(): Promise<MarketingCampaignEntity[]> {
-    return this.drizzle.query.marketingCampaigns.findMany() as unknown as Promise<
-      MarketingCampaignEntity[]
-    >;
+    return this.drizzle.query.marketingCampaigns.findMany({
+      with: {
+        customers: true,
+      },
+    }) as unknown as Promise<MarketingCampaignEntity[]>;
   }
 
   async drop(): Promise<void> {

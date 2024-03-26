@@ -1,5 +1,5 @@
 {
-  "id": "d4a71bf9-eed0-410b-a612-533f222faa7d",
+  "id": "ba174199-a5e4-4383-abdf-5f0b6684c20b",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
@@ -194,6 +194,63 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "marketing_campaigns_on_customers": {
+      "name": "marketing_campaigns_on_customers",
+      "schema": "",
+      "columns": {
+        "marketing_campaign_id": {
+          "name": "marketing_campaign_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "customer_id": {
+          "name": "customer_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "marketing_campaigns_on_customers_marketing_campaign_id_marketing_campaigns_id_fk": {
+          "name": "marketing_campaigns_on_customers_marketing_campaign_id_marketing_campaigns_id_fk",
+          "tableFrom": "marketing_campaigns_on_customers",
+          "tableTo": "marketing_campaigns",
+          "columnsFrom": [
+            "marketing_campaign_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "marketing_campaigns_on_customers_customer_id_customers_id_fk": {
+          "name": "marketing_campaigns_on_customers_customer_id_customers_id_fk",
+          "tableFrom": "marketing_campaigns_on_customers",
+          "tableTo": "customers",
+          "columnsFrom": [
+            "customer_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "marketing_campaigns_on_customers_customer_id_marketing_campaign_id_pk": {
+          "name": "marketing_campaigns_on_customers_customer_id_marketing_campaign_id_pk",
+          "columns": [
+            "customer_id",
+            "marketing_campaign_id"
+          ]
+        }
+      },
       "uniqueConstraints": {}
     },
     "marketing_campaigns": {

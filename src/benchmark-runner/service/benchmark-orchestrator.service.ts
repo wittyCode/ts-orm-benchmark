@@ -61,7 +61,7 @@ export class BenchmarkOrchestratorService {
 
   async runReadBenchmark(
     dbDriver: BenchmarkType,
-    // TODO: make batchsize part of this
+    // TODO: make read batchsize part of this
     //customerSize: number,
   ): Promise<number> {
     this.loggerService.log(`Benchmark for ${dbDriver} started!`);
@@ -74,7 +74,7 @@ export class BenchmarkOrchestratorService {
       );
     }
     this.loggerService.log(
-      // TODO conditional pretty printing depending on duration (ms, s, min)
+      // TODO: conditional pretty printing depending on duration (ms, s, min)
       `Benchmark for ${dbDriver} finished in ${Math.round(
         duration / 1000,
       )} seconds!`,

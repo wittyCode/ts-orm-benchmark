@@ -104,6 +104,7 @@ export class CustomerDrizzleRepository {
             orderedParts: true,
           },
           bills: true,
+          marketingCampaigns: true,
         },
       })
       .execute() as unknown as Promise<CustomerEntity[]>;
