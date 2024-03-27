@@ -11,9 +11,10 @@ import { runTypedSearchQuery, updatedEntity } from '../drizzle.helper';
 import { ConfigService } from '@nestjs/config';
 import { customerAddress } from '../../schema/address';
 import { customers } from '../../schema/customers';
+import { CustomerRepository } from '../../../benchmark-data/repository/customer.repository';
 
 @Injectable()
-export class CustomerDrizzleRepository {
+export class CustomerDrizzleRepository implements CustomerRepository {
   constructor(
     @Inject(DrizzleAsyncProvider)
     private readonly drizzle: NodePgDatabase<typeof customersSchema>,

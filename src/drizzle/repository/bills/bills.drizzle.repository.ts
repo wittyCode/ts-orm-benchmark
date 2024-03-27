@@ -5,9 +5,10 @@ import { BenchmarkMetricsService } from '../../../benchmark-metrics/service/benc
 import { benchmark } from '../../../benchmark-metrics/util/benchmark.helper';
 import * as billSchema from '../../schema/bills';
 import { BillEntity } from '../../../benchmark-data/model/bill.entity';
+import { BillsRepository } from '../../../benchmark-data/repository/bills.repository';
 
 @Injectable()
-export class BillsDrizzleRepository {
+export class BillsDrizzleRepository implements BillsRepository {
   constructor(
     @Inject(DrizzleAsyncProvider)
     private readonly drizzle: NodePgDatabase<typeof billSchema>,

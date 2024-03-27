@@ -5,9 +5,12 @@ import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { BenchmarkMetricsService } from '../../../benchmark-metrics/service/benchmark-metrics.service';
 import { MarketingCampaignEntity } from '../../../benchmark-data/model/marketing-campaign.entity';
 import { benchmark } from '../../../benchmark-metrics/util/benchmark.helper';
+import { MarketingCampaignsRepository } from '../../../benchmark-data/repository/marketing-campaigns.repository';
 
 @Injectable()
-export class MarketingCampaignsDrizzleRepository {
+export class MarketingCampaignsDrizzleRepository
+  implements MarketingCampaignsRepository
+{
   constructor(
     @Inject(DrizzleAsyncProvider)
     private readonly drizzle: NodePgDatabase<typeof campaignSchema>,

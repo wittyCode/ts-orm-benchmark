@@ -41,7 +41,6 @@ export const customers = pgTable(
   },
 );
 // TODO: collect all relations in this block instead of having separate blocks! (big learning if this works)
-// TODO: look through videos of sakura dev again to check if relations can be simplified!
 export const customerRelations = relations(customers, ({ many }) => ({
   customersOrders: many(ordersSchema.orders, {
     relationName: 'customers_orders',

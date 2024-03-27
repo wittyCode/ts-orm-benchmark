@@ -13,9 +13,10 @@ import { sql } from 'drizzle-orm';
 import { LoggerService } from '../../../logger/logger.service';
 import { OrderedPartEntity } from '../../../benchmark-data/model/ordered-part.entity';
 import { BillEntity } from '../../../benchmark-data/model/bill.entity';
+import { OrdersRepository } from '../../../benchmark-data/repository/orders.repository';
 
 @Injectable()
-export class OrderDrizzleRepository {
+export class OrderDrizzleRepository implements OrdersRepository {
   constructor(
     @Inject(DrizzleAsyncProvider)
     private readonly drizzle: NodePgDatabase<typeof orderSchema>,
