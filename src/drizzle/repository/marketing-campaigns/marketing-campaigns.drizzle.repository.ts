@@ -1,11 +1,17 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { DrizzleAsyncProvider } from '../../drizzle.provider';
 import * as campaignSchema from '../../schema/marketing-campaigns';
+import * as joinTableSchema from '../../schema/marketing-campaigns-on-customers';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { BenchmarkMetricsService } from '../../../benchmark-metrics/service/benchmark-metrics.service';
 import { MarketingCampaignEntity } from '../../../benchmark-data/model/marketing-campaign.entity';
 import { benchmark } from '../../../benchmark-metrics/util/benchmark.helper';
-import { MarketingCampaignsRepository } from '../../../benchmark-data/repository/marketing-campaigns.repository';
+import {
+  MarketingCampaignToCustomer,
+  MarketingCampaignsRepository,
+} from '../../../benchmark-data/repository/marketing-campaigns.repository';
+
+const chunkSize = 1000;
 
 @Injectable()
 export class MarketingCampaignsDrizzleRepository
@@ -24,8 +30,7 @@ export class MarketingCampaignsDrizzleRepository
     // or with "Maximum call stack size exceeded" error
     // TODO: think if this can be parallelized with Promise.all
     // TODO: move  chunkSize to env
-    const expectedChunks = Math.ceil(marketingCampaigns.length / 1000);
-    const chunkSize = 1000;
+    const expectedChunks = Math.ceil(marketingCampaigns.length / chunkSize);
     for (let i = 0; i < marketingCampaigns.length; i += chunkSize) {
       const chunk = marketingCampaigns.slice(i, i + chunkSize);
       await benchmark(
@@ -44,6 +49,33 @@ export class MarketingCampaignsDrizzleRepository
     await this.drizzle
       .insert(campaignSchema.marketingCampaigns)
       .values(marketingCampaigns)
+      .execute();
+  }
+
+  async linkMarketingCampaignsToCustomers(
+    marketingCampaignsToCustomer: MarketingCampaignToCustomer[],
+  ): Promise<void> {
+    const expectedChunks = Math.ceil(
+      marketingCampaignsToCustomer.length / chunkSize,
+    );
+    for (let i = 0; i < marketingCampaignsToCustomer.length; i += chunkSize) {
+      const chunk = marketingCampaignsToCustomer.slice(i, i + chunkSize);
+      await benchmark(
+        'DRIZZLE: insert marketing campaigns to customer relation chunks',
+        this.linkChunksOfMarketingCampaignsToCusomters.bind(this),
+        this.benchmarkMetricsService.resultMap,
+        chunk,
+      );
+      console.log(`chunk ${i / chunkSize + 1} of ${expectedChunks} done!`);
+    }
+  }
+
+  async linkChunksOfMarketingCampaignsToCusomters(
+    campaignToCustomerChunks: MarketingCampaignToCustomer[],
+  ) {
+    await this.drizzle
+      .insert(joinTableSchema.marketingCampaignsOnCustomers)
+      .values(campaignToCustomerChunks)
       .execute();
   }
 

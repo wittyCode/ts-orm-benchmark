@@ -8,6 +8,7 @@ import { BillEntity } from '../../benchmark-data/model/bill.entity';
 import { BillsFakerService } from './bills-faker.service';
 import { MarketingCampaignEntity } from '../../benchmark-data/model/marketing-campaign.entity';
 import { MarketingCampaignFakerService } from './marketing-campaign-faker.service';
+import { MarketingCampaignToCustomer } from '../../benchmark-data/repository/marketing-campaigns.repository';
 
 @Injectable()
 export class CreateMockService {
@@ -18,6 +19,27 @@ export class CreateMockService {
     private readonly loggerService: LoggerService,
     private readonly benchmarkService: BenchmarkMetricsService,
   ) {}
+
+  async createRandomlyLinkedCampaignsToCustomers(
+    marketingCampaigns: MarketingCampaignEntity[],
+    customers: CustomerEntity[],
+    maxAmount: number,
+  ): Promise<MarketingCampaignToCustomer[]> {
+    const entities = await benchmark<MarketingCampaignToCustomer[]>(
+      `Create relations between marketing Campaigns and customers`,
+      this.marketingCampaignFakerService.createRandomlyLinkedCampaignsToCustomers.bind(
+        this.marketingCampaignFakerService,
+      ),
+      this.benchmarkService.resultMap,
+      marketingCampaigns,
+      customers,
+      maxAmount,
+    );
+    this.loggerService.log(
+      `${entities.length} join talbe entries for campaigns to customers created`,
+    );
+    return entities;
+  }
 
   async createMockMarketingCampaigns(amount: number) {
     const entities = await benchmark<MarketingCampaignEntity[]>(

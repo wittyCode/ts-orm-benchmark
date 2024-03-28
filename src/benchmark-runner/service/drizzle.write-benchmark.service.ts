@@ -10,6 +10,7 @@ import { benchmark } from '../../benchmark-metrics/util/benchmark.helper';
 import { ConfigService } from '@nestjs/config';
 
 export const marketingCampaignDivisorKey = 'MARKETING_CAMPAIGN_DIVISOR';
+export const customersPerCampaignKey = 'MARKETING_CAMPAINGS_TO_CUSTOMER_FACTOR';
 
 @Injectable()
 export class DrizzleWriteBenchmarkService {
@@ -71,12 +72,25 @@ export class DrizzleWriteBenchmarkService {
         marketingCampaignCount,
       );
 
+    const customersPerCampaign =
+      parseInt(this.configService.get<string>(customersPerCampaignKey)) || 10;
+    this.loggerService.log(
+      `Creating joinTable entries for marketing campaigns with up to ${customersPerCampaign} customers per campaign`,
+    );
+    const customersPerCampaignEntities =
+      await this.createMockService.createRandomlyLinkedCampaignsToCustomers(
+        marketingCampaignEntities,
+        customerEntities,
+        customersPerCampaign,
+      );
+
     const sumOfAll =
       customerEntities.length +
       orderCount +
       orderedPartsFlatCount +
       billEntities.length +
-      marketingCampaignCount;
+      marketingCampaignCount +
+      customersPerCampaignEntities.length;
 
     this.loggerService.log(
       `
@@ -86,6 +100,7 @@ export class DrizzleWriteBenchmarkService {
       ${orderedPartsFlatCount} ordered part data entries created!
       ${billEntities.length} bill entities created!
       ${marketingCampaignCount} marketing campaign entities created!
+      ${customersPerCampaignEntities} joinTable entities between customers and marketingCampaigns created!
       `,
     );
 
@@ -147,6 +162,17 @@ export class DrizzleWriteBenchmarkService {
     );
 
     // 6. insert jointable marketing campaing <-> customers
+    this.loggerService.log(
+      'Inserting joinTable entries for marketing campaigns to customers',
+    );
+    await benchmark(
+      'insertAllJoinTableEntries',
+      this.marketingCampaignsDrizzleRepository.linkMarketingCampaignsToCustomers.bind(
+        this.marketingCampaignsDrizzleRepository,
+      ),
+      this.benchmarkService.resultMap,
+      customersPerCampaignEntities,
+    );
 
     const duration = performance.now() - startTime;
     return [duration, sumOfAll];

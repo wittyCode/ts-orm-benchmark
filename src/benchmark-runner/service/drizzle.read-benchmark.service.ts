@@ -70,6 +70,8 @@ export class DrizzleReadBenchmarkService {
       `Found ${marketingCampaigns.length} marketing campaigns`,
     );
 
+    // TODO: check how to read joinTable
+
     const duration = performance.now() - startTime;
     return duration;
   }

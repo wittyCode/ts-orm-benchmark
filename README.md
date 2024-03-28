@@ -48,6 +48,7 @@ The size of the data needs to be configurable in the environment. The following 
 - The number of ordered parts is the number of orders multiplied with a factor between 1 and 10
 - The number of bills is equal to the number of orders
 - The number of marketing campaigns is the number of customers divided by 100
+- The number of customers per marketing campaigns is between 1 and 10
 
 Comparison is done by marking the performance of each database operation and calculating the average, median and 90%-percentile to get meaningful numbers for repeated operations, e.g. chunk inserts/updates
 
@@ -76,6 +77,7 @@ Configure your sizes in the .env file of your repo. The following keys are used:
 - ORDER_AMOUNT_FACTOR - max number of orders per customer
 - ORDERED_PARTS_FACTOR - max number of ordered parts per order
 - MARKETING_CAMPAIGN_DIVISOR - how many marketing campaigns when compared to number of customers
+- MARKETING_CAMPAINGS_TO_CUSTOMER_FACTOR - max number of customers that are assigned to one marketing campaign in the joinTable
 
 - CUSTOMER_CHUNK_SIZE chunk size used when chunking inserts of big amounts of customer entities
 - ORDER_CHUNK_SIZE chunk size used when chunking inserts of big amounts of order/orderedParts entities

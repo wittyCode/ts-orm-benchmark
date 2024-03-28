@@ -1,6 +1,14 @@
 import { MarketingCampaignEntity } from '../model/marketing-campaign.entity';
 
+export interface MarketingCampaignToCustomer {
+  customerId: string;
+  marketingCampaignId: string;
+}
+
 export interface MarketingCampaignsRepository {
+  linkMarketingCampaignsToCustomers(
+    marketingCampaignsToCustomer: MarketingCampaignToCustomer[],
+  ): Promise<void>;
   upsertManyMarketingCampaigns(
     marketingCampaigns: MarketingCampaignEntity[],
   ): Promise<void>;
