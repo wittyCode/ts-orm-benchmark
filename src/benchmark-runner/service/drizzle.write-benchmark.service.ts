@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { BenchmarkMetricsService } from '../../benchmark-metrics/service/benchmark-metrics.service';
-import { CustomerDrizzleRepository } from '../../drizzle/repository/customer/customer.drizzle.repository';
-import { OrderDrizzleRepository } from '../../drizzle/repository/orders/order.drizzle.repository';
-import { BillsDrizzleRepository } from '../../drizzle/repository/bills/bills.drizzle.repository';
-import { MarketingCampaignsDrizzleRepository } from '../../drizzle/repository/marketing-campaigns/marketing-campaigns.drizzle.repository';
 import { LoggerService } from '../../logger/logger.service';
 import { CreateMockService } from '../../mock-creator/service/create-mock.service';
 import { benchmark } from '../../benchmark-metrics/util/benchmark.helper';
 import { ConfigService } from '@nestjs/config';
+import { DrizzleCustomerRepository } from '../../drizzle/repository/customer/drizzle.customer.repository';
+import { DrizzleOrderRepository } from '../../drizzle/repository/orders/drizzle.order.repository';
+import { DrizzleBillsRepository } from '../../drizzle/repository/bills/drizzle.bills.repository';
+import { DrizzleMarketingCampaignsRepository } from '../../drizzle/repository/marketing-campaigns/drizzle.marketing-campaigns.repository';
 
 export const marketingCampaignDivisorKey = 'MARKETING_CAMPAIGN_DIVISOR';
 export const customersPerCampaignKey = 'MARKETING_CAMPAINGS_TO_CUSTOMER_FACTOR';
@@ -17,10 +17,10 @@ export class DrizzleWriteBenchmarkService {
   constructor(
     private readonly createMockService: CreateMockService,
     private readonly benchmarkService: BenchmarkMetricsService,
-    private readonly customerDrizzleRepository: CustomerDrizzleRepository,
-    private readonly orderDrizzleRepository: OrderDrizzleRepository,
-    private readonly billDrizzleRepository: BillsDrizzleRepository,
-    private readonly marketingCampaignsDrizzleRepository: MarketingCampaignsDrizzleRepository,
+    private readonly customerDrizzleRepository: DrizzleCustomerRepository,
+    private readonly orderDrizzleRepository: DrizzleOrderRepository,
+    private readonly billDrizzleRepository: DrizzleBillsRepository,
+    private readonly marketingCampaignsDrizzleRepository: DrizzleMarketingCampaignsRepository,
     private readonly loggerService: LoggerService,
     private readonly configService: ConfigService,
   ) {}

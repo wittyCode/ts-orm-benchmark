@@ -14,7 +14,7 @@ import { customers } from '../../schema/customers';
 import { CustomerRepository } from '../../../benchmark-data/repository/customer.repository';
 
 @Injectable()
-export class CustomerDrizzleRepository implements CustomerRepository {
+export class DrizzleCustomerRepository implements CustomerRepository {
   constructor(
     @Inject(DrizzleAsyncProvider)
     private readonly drizzle: NodePgDatabase<typeof customersSchema>,

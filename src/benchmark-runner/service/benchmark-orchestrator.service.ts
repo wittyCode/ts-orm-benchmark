@@ -1,7 +1,8 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { LoggerService } from '../../logger/logger.service';
-import { DrizzleReadBenchmarkService } from './drizzle.read-benchmark.service';
 import { DrizzleWriteBenchmarkService } from './drizzle.write-benchmark.service';
+import { BenchmarkRepositoryFactoryService } from './benchmark-repository-factory.service';
+import { ReadBenchmarkService } from './read-benchmark.service';
 
 export enum BenchmarkType {
   DRIZZLE = 'drizzle',
@@ -17,8 +18,9 @@ export enum BenchmarkType {
 @Injectable()
 export class BenchmarkOrchestratorService {
   constructor(
-    private readonly drizzleReadBenchmarkService: DrizzleReadBenchmarkService,
+    private readonly readBenchmarkService: ReadBenchmarkService,
     private readonly drizzleWriteBenchmarkService: DrizzleWriteBenchmarkService,
+    private readonly benchmarkRepositoryFactoryService: BenchmarkRepositoryFactoryService,
     private readonly loggerService: LoggerService,
   ) {}
 
@@ -65,14 +67,10 @@ export class BenchmarkOrchestratorService {
     //customerSize: number,
   ): Promise<number> {
     this.loggerService.log(`Benchmark for ${dbDriver} started!`);
-    let duration = -1;
-    if (dbDriver === BenchmarkType.DRIZZLE) {
-      duration = await this.drizzleReadBenchmarkService.runReadBenchmark();
-    } else {
-      throw new InternalServerErrorException(
-        `Database driver ${dbDriver} currently not supported yet`,
-      );
-    }
+    const repositories =
+      this.benchmarkRepositoryFactoryService.createRepositoryDelegate(dbDriver);
+    const duration =
+      await this.readBenchmarkService.runReadBenchmark(repositories);
     this.loggerService.log(
       // TODO: conditional pretty printing depending on duration (ms, s, min)
       `Benchmark for ${dbDriver} finished in ${Math.round(

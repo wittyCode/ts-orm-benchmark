@@ -8,7 +8,7 @@ import { BillEntity } from '../../../benchmark-data/model/bill.entity';
 import { BillsRepository } from '../../../benchmark-data/repository/bills.repository';
 
 @Injectable()
-export class BillsDrizzleRepository implements BillsRepository {
+export class DrizzleBillsRepository implements BillsRepository {
   constructor(
     @Inject(DrizzleAsyncProvider)
     private readonly drizzle: NodePgDatabase<typeof billSchema>,

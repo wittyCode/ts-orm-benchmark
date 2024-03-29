@@ -5,24 +5,17 @@ import { MarketingCampaignEntity } from '../../benchmark-data/model/marketing-ca
 import { OrderEntity } from '../../benchmark-data/model/order.entity';
 import { benchmark } from '../../benchmark-metrics/util/benchmark.helper';
 import { BenchmarkMetricsService } from '../../benchmark-metrics/service/benchmark-metrics.service';
-import { CustomerDrizzleRepository } from '../../drizzle/repository/customer/customer.drizzle.repository';
-import { OrderDrizzleRepository } from '../../drizzle/repository/orders/order.drizzle.repository';
-import { BillsDrizzleRepository } from '../../drizzle/repository/bills/bills.drizzle.repository';
-import { MarketingCampaignsDrizzleRepository } from '../../drizzle/repository/marketing-campaigns/marketing-campaigns.drizzle.repository';
 import { LoggerService } from '../../logger/logger.service';
+import { BenchmarkInputRepositoryDelegate } from '../../benchmark-data/repository/benchmark-input-repository-delegate';
 
 @Injectable()
-export class DrizzleReadBenchmarkService {
+export class ReadBenchmarkService {
   constructor(
     private readonly benchmarkService: BenchmarkMetricsService,
-    private readonly customerDrizzleRepository: CustomerDrizzleRepository,
-    private readonly orderDrizzleRepository: OrderDrizzleRepository,
-    private readonly billDrizzleRepository: BillsDrizzleRepository,
-    private readonly marketingCampaignsDrizzleRepository: MarketingCampaignsDrizzleRepository,
     private readonly loggerService: LoggerService,
   ) {}
 
-  async runReadBenchmark() {
+  async runReadBenchmark(repositories: BenchmarkInputRepositoryDelegate) {
     const startTime = performance.now();
     //this.loggerService.log(
     //  `Benchmark for reads started with size ${customerSize}`,
@@ -32,8 +25,8 @@ export class DrizzleReadBenchmarkService {
     this.loggerService.log('Reading customers');
     const customers = await benchmark<CustomerEntity[]>(
       'findAllCustomers',
-      this.customerDrizzleRepository.findAll.bind(
-        this.customerDrizzleRepository,
+      repositories.customerRepository.findAll.bind(
+        repositories.customerRepository,
       ),
       this.benchmarkService.resultMap,
     );
@@ -43,7 +36,7 @@ export class DrizzleReadBenchmarkService {
     this.loggerService.log('Reading orders');
     const orders = await benchmark<OrderEntity[]>(
       'findAllOrders',
-      this.orderDrizzleRepository.findAll.bind(this.orderDrizzleRepository),
+      repositories.ordersRepository.findAll.bind(repositories.ordersRepository),
       this.benchmarkService.resultMap,
     );
     this.loggerService.log(`Found ${orders.length} orders`);
@@ -52,7 +45,7 @@ export class DrizzleReadBenchmarkService {
     this.loggerService.log('Reading bills');
     const bills = await benchmark<BillEntity[]>(
       'findAllBills',
-      this.billDrizzleRepository.findAll.bind(this.billDrizzleRepository),
+      repositories.billsRepository.findAll.bind(repositories.billsRepository),
       this.benchmarkService.resultMap,
     );
     this.loggerService.log(`Found ${bills.length} bills`);
@@ -61,8 +54,8 @@ export class DrizzleReadBenchmarkService {
     this.loggerService.log('Reading marketing campaigns');
     const marketingCampaigns = await benchmark<MarketingCampaignEntity[]>(
       'findAllMarketingCampaigns',
-      this.marketingCampaignsDrizzleRepository.findAll.bind(
-        this.marketingCampaignsDrizzleRepository,
+      repositories.marketingCampaignsRepository.findAll.bind(
+        repositories.marketingCampaignsRepository,
       ),
       this.benchmarkService.resultMap,
     );

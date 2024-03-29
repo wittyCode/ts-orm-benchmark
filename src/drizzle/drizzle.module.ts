@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { drizzleProvider } from './drizzle.provider';
 import { BenchmarkMetricsModule } from '../benchmark-metrics/benchmark-metrics.module';
-import { CustomerDrizzleRepository } from './repository/customer/customer.drizzle.repository';
-import { OrderDrizzleRepository } from './repository/orders/order.drizzle.repository';
 import { LoggerModule } from '../logger/logger.module';
-import { BillsDrizzleRepository } from './repository/bills/bills.drizzle.repository';
-import { MarketingCampaignsDrizzleRepository } from './repository/marketing-campaigns/marketing-campaigns.drizzle.repository';
+import { DrizzleOrderRepository } from './repository/orders/drizzle.order.repository';
+import { DrizzleBillsRepository } from './repository/bills/drizzle.bills.repository';
+import { DrizzleMarketingCampaignsRepository } from './repository/marketing-campaigns/drizzle.marketing-campaigns.repository';
+import { DrizzleCustomerRepository } from './repository/customer/drizzle.customer.repository';
 
 /**
  * Module for the drizzle ORM. Contains the providers for the drizzle ORM and
@@ -16,17 +16,17 @@ import { MarketingCampaignsDrizzleRepository } from './repository/marketing-camp
   // TODO: taken from tutorial, must this be an array with spread? look into this
   providers: [
     ...drizzleProvider,
-    CustomerDrizzleRepository,
-    OrderDrizzleRepository,
-    BillsDrizzleRepository,
-    MarketingCampaignsDrizzleRepository,
+    DrizzleCustomerRepository,
+    DrizzleOrderRepository,
+    DrizzleBillsRepository,
+    DrizzleMarketingCampaignsRepository,
   ],
   exports: [
     ...drizzleProvider,
-    CustomerDrizzleRepository,
-    OrderDrizzleRepository,
-    BillsDrizzleRepository,
-    MarketingCampaignsDrizzleRepository,
+    DrizzleCustomerRepository,
+    DrizzleOrderRepository,
+    DrizzleBillsRepository,
+    DrizzleMarketingCampaignsRepository,
   ],
 })
 export class DrizzleModule {}

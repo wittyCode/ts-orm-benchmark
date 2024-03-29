@@ -16,7 +16,7 @@ import { BillEntity } from '../../../benchmark-data/model/bill.entity';
 import { OrdersRepository } from '../../../benchmark-data/repository/orders.repository';
 
 @Injectable()
-export class OrderDrizzleRepository implements OrdersRepository {
+export class DrizzleOrderRepository implements OrdersRepository {
   constructor(
     @Inject(DrizzleAsyncProvider)
     private readonly drizzle: NodePgDatabase<typeof orderSchema>,

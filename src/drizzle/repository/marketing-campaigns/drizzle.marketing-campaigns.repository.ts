@@ -14,7 +14,7 @@ import {
 const chunkSize = 1000;
 
 @Injectable()
-export class MarketingCampaignsDrizzleRepository
+export class DrizzleMarketingCampaignsRepository
   implements MarketingCampaignsRepository
 {
   constructor(
