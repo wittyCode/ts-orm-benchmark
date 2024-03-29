@@ -10,9 +10,9 @@ export class BenchmarkRunnerController {
     private readonly benchmarkOrchestratorService: BenchmarkOrchestratorService,
   ) {}
 
-  @Get('/reset')
-  async resetBenchmark() {
-    await this.benchmarkOrchestratorService.resetBenchmark();
+  @Get(':dbDriver/reset')
+  async resetBenchmark(@Param('dbDriver') dbDriver: BenchmarkType) {
+    await this.benchmarkOrchestratorService.resetBenchmark(dbDriver);
     return { status: 'Benchmark reset!' };
   }
 
@@ -21,7 +21,7 @@ export class BenchmarkRunnerController {
     @Param('amount') amount: number,
     @Param('dbDriver') dbDriver: BenchmarkType,
   ) {
-    const duration = await this.benchmarkOrchestratorService.runInsertBenchmark(
+    const duration = await this.benchmarkOrchestratorService.runWriteBenchmark(
       dbDriver,
       amount,
     );

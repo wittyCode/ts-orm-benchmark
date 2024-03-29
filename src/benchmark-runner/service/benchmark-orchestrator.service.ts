@@ -1,8 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { LoggerService } from '../../logger/logger.service';
-import { DrizzleWriteBenchmarkService } from './drizzle.write-benchmark.service';
 import { BenchmarkRepositoryFactoryService } from './benchmark-repository-factory.service';
 import { ReadBenchmarkService } from './read-benchmark.service';
+import { WriteBenchmarkService } from './write-benchmark.service';
 
 export enum BenchmarkType {
   DRIZZLE = 'drizzle',
@@ -19,41 +19,39 @@ export enum BenchmarkType {
 export class BenchmarkOrchestratorService {
   constructor(
     private readonly readBenchmarkService: ReadBenchmarkService,
-    private readonly drizzleWriteBenchmarkService: DrizzleWriteBenchmarkService,
+    private readonly drizzleWriteBenchmarkService: WriteBenchmarkService,
     private readonly benchmarkRepositoryFactoryService: BenchmarkRepositoryFactoryService,
     private readonly loggerService: LoggerService,
   ) {}
 
   // TODO: make db driver param and use correct repo for reset
-  async resetBenchmark(): Promise<void> {
+  async resetBenchmark(dbDriver: BenchmarkType): Promise<void> {
     this.loggerService.log('Resetting benchmark');
-    this.drizzleWriteBenchmarkService.resetBenchmark();
+    const repositories =
+      this.benchmarkRepositoryFactoryService.createRepositoryDelegate(dbDriver);
+    this.drizzleWriteBenchmarkService.resetBenchmark(repositories);
   }
 
   /*
-    have separate benchmarks for inserts and different types or reads/reports
+    we have separate benchmarks for inserts and different types or reads/reports
    */
-  async runInsertBenchmark(
+  async runWriteBenchmark(
     dbDriver: BenchmarkType,
     customerSize: number,
   ): Promise<number> {
     this.loggerService.log(`Benchmark for ${dbDriver} started!`);
 
-    let duration = -1;
-    let sumOfAll = -1;
-
-    if (dbDriver === BenchmarkType.DRIZZLE) {
-      [duration, sumOfAll] =
-        await this.drizzleWriteBenchmarkService.runWriteBenchmark(customerSize);
-    } else {
-      throw new InternalServerErrorException(
-        `Database driver ${dbDriver} currently not supported yet`,
+    const repositories =
+      this.benchmarkRepositoryFactoryService.createRepositoryDelegate(dbDriver);
+    const [duration, sumOfAll] =
+      await this.drizzleWriteBenchmarkService.runWriteBenchmark(
+        repositories,
+        customerSize,
       );
-    }
 
     this.loggerService.log(
       // TODO: conditional pretty printing depending on duration (ms, s, min)
-      `Benchmark for ${dbDriver} finished in ${Math.round(
+      `benchmark for ${dbDriver} finished in ${Math.round(
         duration / 1000,
       )} seconds!,
       ${sumOfAll} entities created overall!`,
@@ -62,18 +60,18 @@ export class BenchmarkOrchestratorService {
   }
 
   async runReadBenchmark(
-    dbDriver: BenchmarkType,
+    dbdriver: BenchmarkType,
     // TODO: make read batchsize part of this
-    //customerSize: number,
+    //customersize: number,
   ): Promise<number> {
-    this.loggerService.log(`Benchmark for ${dbDriver} started!`);
+    this.loggerService.log(`benchmark for ${dbdriver} started!`);
     const repositories =
-      this.benchmarkRepositoryFactoryService.createRepositoryDelegate(dbDriver);
+      this.benchmarkRepositoryFactoryService.createRepositoryDelegate(dbdriver);
     const duration =
       await this.readBenchmarkService.runReadBenchmark(repositories);
     this.loggerService.log(
       // TODO: conditional pretty printing depending on duration (ms, s, min)
-      `Benchmark for ${dbDriver} finished in ${Math.round(
+      `benchmark for ${dbdriver} finished in ${Math.round(
         duration / 1000,
       )} seconds!`,
     );

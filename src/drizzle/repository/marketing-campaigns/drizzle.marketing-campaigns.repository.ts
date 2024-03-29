@@ -89,5 +89,8 @@ export class DrizzleMarketingCampaignsRepository
 
   async drop(): Promise<void> {
     await this.drizzle.delete(campaignSchema.marketingCampaigns).execute();
+    await this.drizzle
+      .delete(joinTableSchema.marketingCampaignsOnCustomers)
+      .execute();
   }
 }

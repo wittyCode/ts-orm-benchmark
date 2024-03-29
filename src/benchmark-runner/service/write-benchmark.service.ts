@@ -4,41 +4,40 @@ import { LoggerService } from '../../logger/logger.service';
 import { CreateMockService } from '../../mock-creator/service/create-mock.service';
 import { benchmark } from '../../benchmark-metrics/util/benchmark.helper';
 import { ConfigService } from '@nestjs/config';
-import { DrizzleCustomerRepository } from '../../drizzle/repository/customer/drizzle.customer.repository';
-import { DrizzleOrderRepository } from '../../drizzle/repository/orders/drizzle.order.repository';
-import { DrizzleBillsRepository } from '../../drizzle/repository/bills/drizzle.bills.repository';
-import { DrizzleMarketingCampaignsRepository } from '../../drizzle/repository/marketing-campaigns/drizzle.marketing-campaigns.repository';
+import { BenchmarkInputRepositoryDelegate } from '../../benchmark-data/repository/benchmark-input-repository-delegate';
 
 export const marketingCampaignDivisorKey = 'MARKETING_CAMPAIGN_DIVISOR';
 export const customersPerCampaignKey = 'MARKETING_CAMPAINGS_TO_CUSTOMER_FACTOR';
 
 @Injectable()
-export class DrizzleWriteBenchmarkService {
+export class WriteBenchmarkService {
   constructor(
     private readonly createMockService: CreateMockService,
     private readonly benchmarkService: BenchmarkMetricsService,
-    private readonly customerDrizzleRepository: DrizzleCustomerRepository,
-    private readonly orderDrizzleRepository: DrizzleOrderRepository,
-    private readonly billDrizzleRepository: DrizzleBillsRepository,
-    private readonly marketingCampaignsDrizzleRepository: DrizzleMarketingCampaignsRepository,
     private readonly loggerService: LoggerService,
     private readonly configService: ConfigService,
   ) {}
 
-  async resetBenchmark(): Promise<void> {
+  async resetBenchmark(
+    repositories: BenchmarkInputRepositoryDelegate,
+  ): Promise<void> {
     this.loggerService.log('Resetting benchmark');
     // FK cascading deletes will delete addresses, orders as well
-    await this.customerDrizzleRepository.drop();
-    await this.billDrizzleRepository.drop();
-    await this.marketingCampaignsDrizzleRepository.drop();
+    await repositories.customerRepository.drop();
+    await repositories.billsRepository.drop();
+    await repositories.marketingCampaignsRepository.drop();
     this.benchmarkService.resultMap.clear();
   }
 
-  async runWriteBenchmark(customerSize: number) {
+  async runWriteBenchmark(
+    repositories: BenchmarkInputRepositoryDelegate,
+    customerSize: number,
+  ) {
     const startTime = performance.now();
     this.loggerService.log(
       `Benchmark for inserts started with size ${customerSize}`,
     );
+    // TODO: move step 1 to service, e.g. BenchmarkDataInstantiatorService
     // 1. create fake entities (do that in the beginning or do it for each entity? => probably for each, due to large sizes of later entities)
     this.loggerService.log(`Creating ${customerSize} fake customers`);
     const customerEntities =
@@ -108,8 +107,8 @@ export class DrizzleWriteBenchmarkService {
     this.loggerService.log('Inserting customers');
     await benchmark(
       'insertAllCustomers',
-      this.customerDrizzleRepository.upsertManyCustomers.bind(
-        this.customerDrizzleRepository,
+      repositories.customerRepository.upsertManyCustomers.bind(
+        repositories.customerRepository,
       ),
       this.benchmarkService.resultMap,
       customerEntities,
@@ -119,8 +118,8 @@ export class DrizzleWriteBenchmarkService {
     this.loggerService.log('Inserting orders');
     await benchmark(
       'insertAllOrders',
-      this.orderDrizzleRepository.upsertManyOrdersFromCustomersAsChunks.bind(
-        this.orderDrizzleRepository,
+      repositories.ordersRepository.upsertManyOrdersFromCustomersAsChunks.bind(
+        repositories.ordersRepository,
       ),
       this.benchmarkService.resultMap,
       customerEntities,
@@ -130,8 +129,8 @@ export class DrizzleWriteBenchmarkService {
     this.loggerService.log('Inserting bills');
     await benchmark(
       'insertAllBills',
-      this.billDrizzleRepository.upsertManyBills.bind(
-        this.billDrizzleRepository,
+      repositories.billsRepository.upsertManyBills.bind(
+        repositories.billsRepository,
       ),
       this.benchmarkService.resultMap,
       billEntities,
@@ -142,8 +141,8 @@ export class DrizzleWriteBenchmarkService {
     const orderedParts = ordersFlat.map((entity) => entity.orderedParts).flat();
     await benchmark(
       'updateOrderedPartsWithBillIds',
-      this.orderDrizzleRepository.updateOrderedPartWithBillId.bind(
-        this.orderDrizzleRepository,
+      repositories.ordersRepository.updateOrderedPartWithBillId.bind(
+        repositories.ordersRepository,
       ),
       this.benchmarkService.resultMap,
       orderedParts,
@@ -154,8 +153,8 @@ export class DrizzleWriteBenchmarkService {
     this.loggerService.log('Inserting marketing campaigns');
     await benchmark(
       'insertAllMarketingCampaigns',
-      this.marketingCampaignsDrizzleRepository.upsertManyMarketingCampaigns.bind(
-        this.marketingCampaignsDrizzleRepository,
+      repositories.marketingCampaignsRepository.upsertManyMarketingCampaigns.bind(
+        repositories.marketingCampaignsRepository,
       ),
       this.benchmarkService.resultMap,
       marketingCampaignEntities,
@@ -167,8 +166,8 @@ export class DrizzleWriteBenchmarkService {
     );
     await benchmark(
       'insertAllJoinTableEntries',
-      this.marketingCampaignsDrizzleRepository.linkMarketingCampaignsToCustomers.bind(
-        this.marketingCampaignsDrizzleRepository,
+      repositories.marketingCampaignsRepository.linkMarketingCampaignsToCustomers.bind(
+        repositories.marketingCampaignsRepository,
       ),
       this.benchmarkService.resultMap,
       customersPerCampaignEntities,
