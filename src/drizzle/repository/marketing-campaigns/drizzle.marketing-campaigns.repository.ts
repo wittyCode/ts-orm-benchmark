@@ -10,8 +10,14 @@ import {
   MarketingCampaignToCustomer,
   MarketingCampaignsRepository,
 } from '../../../benchmark-data/repository/marketing-campaigns.repository';
+import { customers } from '../../schema/customers';
+import { customerAddress } from '../../schema/address';
+import { eq } from 'drizzle-orm';
+import { CampaignReportEntity } from '../../../benchmark-data/model/campaign-report.entity';
+import { JoinedReport } from './helpers';
+import { ConfigService } from '@nestjs/config';
 
-const chunkSize = 1000;
+const campaignChunkSizeKey = 'CAMPAIGNS_CHUNK_SIZE';
 
 @Injectable()
 export class DrizzleMarketingCampaignsRepository
@@ -21,7 +27,9 @@ export class DrizzleMarketingCampaignsRepository
     @Inject(DrizzleAsyncProvider)
     private readonly drizzle: NodePgDatabase<typeof campaignSchema>,
     private readonly benchmarkMetricsService: BenchmarkMetricsService,
+    private readonly configService: ConfigService,
   ) {}
+
   async upsertManyMarketingCampaigns(
     marketingCampaigns: MarketingCampaignEntity[],
   ): Promise<void> {
@@ -29,7 +37,8 @@ export class DrizzleMarketingCampaignsRepository
     // bind message has 4464 parameters but 0 parameters or something like that
     // or with "Maximum call stack size exceeded" error
     // TODO: think if this can be parallelized with Promise.all
-    // TODO: move  chunkSize to env
+    const chunkSize =
+      parseInt(this.configService.get<string>(campaignChunkSizeKey)) || 1000;
     const expectedChunks = Math.ceil(marketingCampaigns.length / chunkSize);
     for (let i = 0; i < marketingCampaigns.length; i += chunkSize) {
       const chunk = marketingCampaigns.slice(i, i + chunkSize);
@@ -55,6 +64,8 @@ export class DrizzleMarketingCampaignsRepository
   async linkMarketingCampaignsToCustomers(
     marketingCampaignsToCustomer: MarketingCampaignToCustomer[],
   ): Promise<void> {
+    const chunkSize =
+      parseInt(this.configService.get<string>(campaignChunkSizeKey)) || 1000;
     const expectedChunks = Math.ceil(
       marketingCampaignsToCustomer.length / chunkSize,
     );
@@ -92,5 +103,67 @@ export class DrizzleMarketingCampaignsRepository
     await this.drizzle
       .delete(joinTableSchema.marketingCampaignsOnCustomers)
       .execute();
+  }
+
+  async findAddressesInCampaigns(): Promise<any> {
+    const rows: JoinedReport[] = (await this.drizzle
+      .select({
+        campaignId: campaignSchema.marketingCampaigns.id,
+        campaignName: campaignSchema.marketingCampaigns.name,
+        customerId: customers.id,
+        customerName: customers.companyName,
+        customerAddress: {
+          ...customerAddress,
+        },
+      })
+      .from(campaignSchema.marketingCampaigns)
+      .innerJoin(
+        joinTableSchema.marketingCampaignsOnCustomers,
+        eq(
+          campaignSchema.marketingCampaigns.id,
+          joinTableSchema.marketingCampaignsOnCustomers.marketingCampaignId,
+        ),
+      )
+      .innerJoin(
+        customers,
+        eq(
+          joinTableSchema.marketingCampaignsOnCustomers.customerId,
+          customers.id,
+        ),
+      )
+      .innerJoin(customerAddress, eq(customers.id, customerAddress.customerId))
+      .orderBy(
+        campaignSchema.marketingCampaigns.id,
+      )) as unknown as JoinedReport[];
+
+    return this.mapRowsToCampaignReportEntities(rows);
+  }
+
+  private mapRowsToCampaignReportEntities(
+    rows: JoinedReport[],
+  ): CampaignReportEntity[] {
+    const result = rows.reduce((acc, row) => {
+      const campaign = {
+        campaignId: row.campaignId,
+        campaignName: row.campaignName,
+      };
+      const customer = {
+        customerId: row.customerId,
+        customerName: row.customerName,
+        customerAddress: { ...row.customerAddress },
+      };
+
+      if (!acc[campaign.campaignId]) {
+        acc[campaign.campaignId] = { campaign, customers: [] };
+      }
+      if (customer) {
+        acc[campaign.campaignId].customers.push(customer);
+      }
+      return acc;
+    }, {});
+    const resultArray = Object.values(result) as CampaignReportEntity[];
+
+    //resultArray.forEach((entry) => console.log(JSON.stringify(entry)));
+    return resultArray;
   }
 }

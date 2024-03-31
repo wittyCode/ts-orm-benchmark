@@ -105,7 +105,9 @@ export class DrizzleCustomerRepository implements CustomerRepository {
             orderedParts: true,
           },
           bills: true,
-          marketingCampaigns: true,
+          marketingCampaigns: {
+            customers: true,
+          },
         },
       })
       .execute() as unknown as Promise<CustomerEntity[]>;

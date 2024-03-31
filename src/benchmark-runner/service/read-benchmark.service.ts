@@ -63,7 +63,18 @@ export class ReadBenchmarkService {
       `Found ${marketingCampaigns.length} marketing campaigns`,
     );
 
-    // TODO: check how to read joinTable
+    // 6. reporting query: find all customerAddresses in a marketingCampaign
+    this.loggerService.log('Reading reports for marketing campaigns');
+    const reports = await benchmark<any[]>(
+      'reportingMarketingCampaigns',
+      repositories.marketingCampaignsRepository.findAddressesInCampaigns.bind(
+        repositories.marketingCampaignsRepository,
+      ),
+      this.benchmarkService.resultMap,
+    );
+    this.loggerService.log(
+      `Found ${reports.length} reports for marketing campaigns`,
+    );
 
     const duration = performance.now() - startTime;
     return duration;

@@ -26,7 +26,8 @@ To be able to compare the different libraries, we will use the following assumpt
 4. We randomize the size of collections of child-entities a bit, to not just have uniform data insertion - since in real production use-cases different sizes of datasets are to be expected.
 5. Statistics and the [Law of Large Numbers](https://en.wikipedia.org/wiki/Law_of_large_numbers) will ensure that we have a normal distribution for entity count so that we can still compare between sufficiently large benchmarks
 6. We're interested in insertion performance, performance of selecting big datasets and of updating selected colums for big datasets in bulk
-7. All data can be easily deleted to also be able to measure bulk deletions
+7. A report-like query to test how joining multiple tables and grouping performs is in place
+8. All data can be easily deleted to also be able to measure bulk deletions
 
 A simple synthetic use-case to achieve our goals is the following:
 
@@ -37,6 +38,7 @@ A simple synthetic use-case to achieve our goals is the following:
 - Every ordered part is assigned to a bill (1-n from bill to ordered part) with a big update statement. This is the bulk update we want to explore
 - All data for a customer needs to be able to be queried. This is where we should be able to see how big selects perform - ideally also when comparing different limits and offsets
 - Our marketing department can create marketing campaigns and roll them out to customers - this is where the many-to-many relation will be in place, a customer can be part of multiple campaigns at the same time and campaigns contain multiple customers.
+- A report is generated, that shows all adresses of customers within the marketing campaigns (join customers to their campaigns, join addresses to their customers, group by campaign)
 
 ![Data model](doc/data_model.png)
 
@@ -81,22 +83,24 @@ Configure your sizes in the .env file of your repo. The following keys are used:
 
 - CUSTOMER_CHUNK_SIZE chunk size used when chunking inserts of big amounts of customer entities
 - ORDER_CHUNK_SIZE chunk size used when chunking inserts of big amounts of order/orderedParts entities
+- CAMPAIGNS_CHUNK_SIZE chunk size used when chunking inserts of big amounts of marketingCampaign entities and joinTable entries
 
 ## TODOs
 
 a lot.
-first of all: finish benchmark setup and drizzle-testing with the last important step: many-to-many relations in join-tables
+first of all: finish benchmark setup and drizzle-testing with the last important step: many-to-many relations in join-tables and a "report-like" join query
 
 afterwards by order of current priority (subject to change):
 
 1. add documentation about methodology, benchmark data model and ways to configure it
 2. add Prisma implementation of repositories for first real comparison of performance
 3. Check and compare with Prisma experimental feature that actually joins data correctly
+4. implement parallelism to be able to simulate multiple clients accessing the db at the same time
 
 unordered:
 
-- Maybe implement a table with a lot of colums to see how inserts there scale when a lot of colums are involved.
 - The current implementation runs into Heapspace memory issues due to the dataset being completely generated in advance and therefore not eligible for garbage collection. We could look into generating test data in chunks as we do for inserting.
+- Maybe implement a table with a lot of colums to see how inserts there scale when a lot of colums are involved.
 - add Frontend to actually look at results - this will be a fun project to dive into React, Vite and tailwind-css
 - support the following ORMs and query builders:
 

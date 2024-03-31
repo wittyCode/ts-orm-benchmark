@@ -19,7 +19,7 @@ export enum BenchmarkType {
 export class BenchmarkOrchestratorService {
   constructor(
     private readonly readBenchmarkService: ReadBenchmarkService,
-    private readonly drizzleWriteBenchmarkService: WriteBenchmarkService,
+    private readonly writeBenchmarkService: WriteBenchmarkService,
     private readonly benchmarkRepositoryFactoryService: BenchmarkRepositoryFactoryService,
     private readonly loggerService: LoggerService,
   ) {}
@@ -29,7 +29,7 @@ export class BenchmarkOrchestratorService {
     this.loggerService.log('Resetting benchmark');
     const repositories =
       this.benchmarkRepositoryFactoryService.createRepositoryDelegate(dbDriver);
-    this.drizzleWriteBenchmarkService.resetBenchmark(repositories);
+    this.writeBenchmarkService.resetBenchmark(repositories);
   }
 
   /*
@@ -44,7 +44,7 @@ export class BenchmarkOrchestratorService {
     const repositories =
       this.benchmarkRepositoryFactoryService.createRepositoryDelegate(dbDriver);
     const [duration, sumOfAll] =
-      await this.drizzleWriteBenchmarkService.runWriteBenchmark(
+      await this.writeBenchmarkService.runWriteBenchmark(
         repositories,
         customerSize,
       );
