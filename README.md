@@ -88,14 +88,13 @@ Configure your sizes in the .env file of your repo. The following keys are used:
 ## TODOs
 
 a lot.
-first of all: finish benchmark setup and drizzle-testing with the last important step: many-to-many relations in join-tables and a "report-like" join query
 
-afterwards by order of current priority (subject to change):
+by order of current priority (subject to change):
 
 1. add documentation about methodology, benchmark data model and ways to configure it
 2. add Prisma implementation of repositories for first real comparison of performance
 3. Check and compare with Prisma experimental feature that actually joins data correctly
-4. implement parallelism to be able to simulate multiple clients accessing the db at the same time
+4. implement parallelism to be able to simulate multiple clients accessing the db at the same time, at least for READ queries, since that is a more realistic use-case than heavy inserts/updates at the same time - later also parallel inserts can be included
 
 unordered:
 
