@@ -15,6 +15,7 @@ export class ReadBenchmarkService {
     private readonly loggerService: LoggerService,
   ) {}
 
+  // TODO : add DB driver to keys for benchmark result map
   async runReadBenchmark(repositories: BenchmarkInputRepositoryDelegate) {
     const startTime = performance.now();
     //this.loggerService.log(
@@ -24,7 +25,7 @@ export class ReadBenchmarkService {
     // 1. find all customers
     this.loggerService.log('Reading customers');
     const customers = await benchmark<CustomerEntity[]>(
-      'findAllCustomers',
+      `findAllCustomers`,
       repositories.customerRepository.findAll.bind(
         repositories.customerRepository,
       ),
