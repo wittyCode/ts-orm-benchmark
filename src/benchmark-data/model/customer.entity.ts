@@ -8,7 +8,6 @@ import { MarketingCampaignEntity } from './marketing-campaign.entity';
 export class CustomerEntity implements TimestampedEntity {
   id: string;
   companyName: string;
-  slug: string;
   status?: CustomerStatusEnum;
   createdAtUtc?: Date;
   updatedAtUtc?: Date;

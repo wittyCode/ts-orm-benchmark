@@ -40,7 +40,7 @@ export const customers = pgTable(
     };
   },
 );
-// TODO: collect all relations in this block instead of having separate blocks! (big learning if this works)
+// TODO: collect all relations in this block instead of having separate blocks! (big learning if this works, first try just moving lower block into this one didnt work)
 export const customerRelations = relations(customers, ({ many }) => ({
   customersOrders: many(ordersSchema.orders, {
     relationName: 'customers_orders',

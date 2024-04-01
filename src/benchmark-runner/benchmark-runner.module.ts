@@ -9,6 +9,7 @@ import { BenchmarkDataModule } from '../benchmark-data/benchmark-data.module';
 import { BenchmarkRepositoryFactoryService } from './service/benchmark-repository-factory.service';
 import { ReadBenchmarkService } from './service/read-benchmark.service';
 import { WriteBenchmarkService } from './service/write-benchmark.service';
+import { PrismaModule } from '../prisma/prisma.module';
 
 /**
  * Benchmark runner module with controller that provides endpoints to run specifically configured benchmarks.
@@ -22,6 +23,7 @@ import { WriteBenchmarkService } from './service/write-benchmark.service';
     BenchmarkMetricsModule,
     BenchmarkDataModule,
     DrizzleModule,
+    PrismaModule,
   ],
   providers: [
     BenchmarkOrchestratorService,

@@ -9,7 +9,7 @@ export const bills = pgTable(
   {
     id: uuid('id').primaryKey().defaultRandom(),
     billNumber: integer('bill_number').notNull(),
-    customerId: uuid('customerId').notNull(),
+    customerId: uuid('customer_id').notNull(),
 
     updatedAtUtc: timestamp('updated_at_utc').notNull().default(defaultUtcNow),
     createdAtUtc: timestamp('created_at_utc').notNull().default(defaultUtcNow),
@@ -21,15 +21,12 @@ export const bills = pgTable(
   },
 );
 
-export const billToCustomerRelation = relations(bills, ({ one }) => ({
+export const billToCustomerRelation = relations(bills, ({ one, many }) => ({
   customer: one(customers, {
     fields: [bills.customerId],
     references: [customers.id],
     relationName: 'bill_to_customer',
   }),
-}));
-
-export const billsToOrderedPartsRelation = relations(bills, ({ many }) => ({
   orderedParts: many(orderedParts, {
     relationName: 'ordered_parts_bill',
   }),

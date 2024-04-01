@@ -8,6 +8,8 @@ I started with Drizzle since there seemed to be a lot of hype around it's perfor
 
 Ideally this will enable people to checkout the repo to their machine, configure the database driver they want to be setup against their local or remote database (first step obviously PostgreSQL since supporting multiple drivers will be more work and I want to finish the different ORMs first)
 
+The goal is not a benchmark with optimized ORM usage - but instead a benchmark with code implemented following tutorials and then applying code tidyings like extracting stuff into methods to improve readability. I do this since this is what I imagine most code to look like: a team learning a new framework/library and using it. When you're more experienced you'll probably be able to optimize - but this is not the scope of this benchmark.
+
 ## On the shoulders of giants
 
 The idea for this project stemmed from the fact that I could not find a relevant existing benchmark.
@@ -25,7 +27,7 @@ To be able to compare the different libraries, we will use the following assumpt
 3. We want a dataset that's sufficiently big, ideally with entities in the millions.
 4. We randomize the size of collections of child-entities a bit, to not just have uniform data insertion - since in real production use-cases different sizes of datasets are to be expected.
 5. Statistics and the [Law of Large Numbers](https://en.wikipedia.org/wiki/Law_of_large_numbers) will ensure that we have a normal distribution for entity count so that we can still compare between sufficiently large benchmarks
-6. We're interested in insertion performance, performance of selecting big datasets and of updating selected colums for big datasets in bulk
+6. We're interested in insertion performance, performance of selecting big datasets and of updating selected columns for big datasets in bulk
 7. A report-like query to test how joining multiple tables and grouping performs is in place
 8. All data can be easily deleted to also be able to measure bulk deletions
 
@@ -95,13 +97,15 @@ by order of current priority (subject to change):
 2. add Prisma implementation of repositories for first real comparison of performance
 3. Check and compare with Prisma experimental feature that actually joins data correctly
 4. implement parallelism to be able to simulate multiple clients accessing the db at the same time, at least for READ queries, since that is a more realistic use-case than heavy inserts/updates at the same time - later also parallel inserts can be included
+5. updated_at_utc update trigger in drizzle
 
 unordered:
 
 - The current implementation runs into Heapspace memory issues due to the dataset being completely generated in advance and therefore not eligible for garbage collection. We could look into generating test data in chunks as we do for inserting.
-- Maybe implement a table with a lot of colums to see how inserts there scale when a lot of colums are involved.
+- Maybe implement a table with a lot of columns to see how inserts there scale when a lot of columns are involved.
 - add Frontend to actually look at results - this will be a fun project to dive into React, Vite and tailwind-css
 - support the following ORMs and query builders:
+- centralize the environment configs for database drivers
 
   typeorm,
   mikro-orm,

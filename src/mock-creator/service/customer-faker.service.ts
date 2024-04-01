@@ -38,7 +38,6 @@ export class CustomerFakerService {
     return {
       id,
       companyName: faker.company.name(),
-      slug: uuid(),
       address,
       orders,
       status: faker.helpers.enumValue(CustomerStatusEnum),

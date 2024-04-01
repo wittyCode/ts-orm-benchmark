@@ -1,20 +1,20 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { DrizzleAsyncProvider } from '../../drizzle.provider';
-import * as campaignSchema from '../../schema/marketing-campaigns';
-import * as joinTableSchema from '../../schema/marketing-campaigns-on-customers';
+import { DrizzleAsyncProvider } from '../drizzle.provider';
+import * as campaignSchema from '../schema/marketing-campaigns';
+import * as joinTableSchema from '../schema/marketing-campaigns-on-customers';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
-import { BenchmarkMetricsService } from '../../../benchmark-metrics/service/benchmark-metrics.service';
-import { MarketingCampaignEntity } from '../../../benchmark-data/model/marketing-campaign.entity';
-import { benchmark } from '../../../benchmark-metrics/util/benchmark.helper';
+import { BenchmarkMetricsService } from '../../benchmark-metrics/service/benchmark-metrics.service';
+import { MarketingCampaignEntity } from '../../benchmark-data/model/marketing-campaign.entity';
+import { benchmark } from '../../benchmark-metrics/util/benchmark.helper';
 import {
   MarketingCampaignToCustomer,
   MarketingCampaignsRepository,
-} from '../../../benchmark-data/repository/marketing-campaigns.repository';
-import { customers } from '../../schema/customers';
-import { customerAddress } from '../../schema/address';
+} from '../../benchmark-data/repository/marketing-campaigns.repository';
+import { customers } from '../schema/customers';
+import { customerAddress } from '../schema/address';
 import { eq } from 'drizzle-orm';
-import { CampaignReportEntity } from '../../../benchmark-data/model/campaign-report.entity';
-import { JoinedReport } from './helpers';
+import { CampaignReportEntity } from '../../benchmark-data/model/campaign-report.entity';
+import { JoinedReport } from './marketing-campaign.helpers';
 import { ConfigService } from '@nestjs/config';
 
 const campaignChunkSizeKey = 'CAMPAIGNS_CHUNK_SIZE';
@@ -99,10 +99,10 @@ export class DrizzleMarketingCampaignsRepository
   }
 
   async drop(): Promise<void> {
-    await this.drizzle.delete(campaignSchema.marketingCampaigns).execute();
     await this.drizzle
       .delete(joinTableSchema.marketingCampaignsOnCustomers)
       .execute();
+    await this.drizzle.delete(campaignSchema.marketingCampaigns).execute();
   }
 
   async findAddressesInCampaigns(): Promise<any> {

@@ -6,6 +6,7 @@ import { BenchmarkMetricsModule } from './benchmark-metrics/benchmark-metrics.mo
 import { MockCreatorModule } from './mock-creator/mock-creator.module';
 import { BenchmarkRunnerModule } from './benchmark-runner/benchmark-runner.module';
 import { BenchmarkDataModule } from './benchmark-data/benchmark-data.module';
+import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { BenchmarkDataModule } from './benchmark-data/benchmark-data.module';
       isGlobal: true,
     }),
     DrizzleModule,
+    PrismaModule,
     BenchmarkMetricsModule,
     MockCreatorModule,
     BenchmarkRunnerModule,

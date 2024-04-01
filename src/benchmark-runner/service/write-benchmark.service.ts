@@ -22,10 +22,10 @@ export class WriteBenchmarkService {
     repositories: BenchmarkInputRepositoryDelegate,
   ): Promise<void> {
     this.loggerService.log('Resetting benchmark');
+    await repositories.marketingCampaignsRepository.drop();
     // FK cascading deletes will delete addresses, orders as well
     await repositories.customerRepository.drop();
     await repositories.billsRepository.drop();
-    await repositories.marketingCampaignsRepository.drop();
     this.benchmarkService.resultMap.clear();
   }
 

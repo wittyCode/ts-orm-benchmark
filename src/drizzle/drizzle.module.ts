@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 import { drizzleProvider } from './drizzle.provider';
 import { BenchmarkMetricsModule } from '../benchmark-metrics/benchmark-metrics.module';
 import { LoggerModule } from '../logger/logger.module';
-import { DrizzleOrderRepository } from './repository/orders/drizzle.order.repository';
-import { DrizzleBillsRepository } from './repository/bills/drizzle.bills.repository';
-import { DrizzleMarketingCampaignsRepository } from './repository/marketing-campaigns/drizzle.marketing-campaigns.repository';
-import { DrizzleCustomerRepository } from './repository/customer/drizzle.customer.repository';
+import { DrizzleCustomerRepository } from './repository/drizzle.customer.repository';
+import { DrizzleOrderRepository } from './repository/drizzle.order.repository';
+import { DrizzleBillsRepository } from './repository/drizzle.bills.repository';
+import { DrizzleMarketingCampaignsRepository } from './repository/drizzle.marketing-campaigns.repository';
 
 /**
  * Module for the drizzle ORM. Contains the providers for the drizzle ORM and

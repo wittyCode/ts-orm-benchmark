@@ -32,6 +32,7 @@ export class ReadBenchmarkService {
       this.benchmarkService.resultMap,
     );
     this.loggerService.log(`Found ${customers.length} customers`);
+    console.log(customers[0]);
 
     // 3. find all orders with ordered parts
     this.loggerService.log('Reading orders');

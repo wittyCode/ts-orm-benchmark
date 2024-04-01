@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,36 +7,97 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum CustomerEnum {
+model bills {
+  id             String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  billNumber    Int @map("bill_number")
+  customerId     String          @db.Uuid @map("customer_id")
+  updatedAtUtc DateTime        @default(dbgenerated("(now() AT TIME ZONE 'utc'::text)")) @db.Timestamp(6) @map("updated_at_utc")
+  createdAtUtc DateTime        @default(dbgenerated("(now() AT TIME ZONE 'utc'::text)")) @db.Timestamp(6) @map("created_at_utc")
+  orderedParts  ordered_parts[]
+  customer       customers @relation(fields: [customerId], references: [id], map: "bill_to_customer")
+
+  @@index([customerId], map: "bill_customer_id")
+}
+
+model customers {
+  id                               String                             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  companyName                      String?                            @map("company_name")
+  customerStatus                   customer_status_enum?              @default(ACTIVE) @map("customer_status")
+  createdAtUtc DateTime        @default(dbgenerated("(now() AT TIME ZONE 'utc'::text)")) @db.Timestamp(6) @map("created_at_utc")
+  updatedAtUtc DateTime        @default(dbgenerated("(now() AT TIME ZONE 'utc'::text)")) @db.Timestamp(6) @map("updated_at_utc")
+  marketingCampaignsOnCustomers marketing_campaigns_on_customers[]
+  orders                           orders[]
+  customersAddress                customers_address? @relation()
+  bills                            bills[] @relation(map: "bill_to_customer")
+
+  @@index([companyName], map: "customers_organization_name_index")
+}
+
+model customers_address {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  country        String
+  state          String?
+  postalCode     String
+  city           String
+  customerId     String    @map("customer_id") @db.Uuid @unique
+  address        String
+  createdAtUtc DateTime        @default(dbgenerated("(now() AT TIME ZONE 'utc'::text)")) @db.Timestamp(6) @map("created_at_utc")
+  updatedAtUtc DateTime        @default(dbgenerated("(now() AT TIME ZONE 'utc'::text)")) @db.Timestamp(6) @map("updated_at_utc")
+  customer       customers @relation(fields: [customerId], references: [id], map: "customers_address_customer_id_customers_id_fk")
+
+  @@index([customerId], map: "address_customer_id_index")
+}
+
+model marketing_campaigns {
+  id                               String                             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                             String
+  startDate                       DateTime                           @db.Timestamp(6) @map("start_date")
+  endDate                         DateTime?                          @db.Timestamp(6) @map("end_date")
+  createdAtUtc DateTime        @default(dbgenerated("(now() AT TIME ZONE 'utc'::text)")) @db.Timestamp(6) @map("created_at_utc")
+  updatedAtUtc DateTime        @default(dbgenerated("(now() AT TIME ZONE 'utc'::text)")) @db.Timestamp(6) @map("updated_at_utc")
+  marketingCampaignsOnCustomers marketing_campaigns_on_customers[]
+}
+
+model marketing_campaigns_on_customers {
+  marketingCampaignId String              @db.Uuid @map("marketing_campaign_id")
+  customerId           String              @db.Uuid @map("customer_id")
+  customers             customers           @relation(fields: [customerId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "marketing_campaigns_on_customers_customer_id_customers_id_fk")
+  marketingCampaigns   marketing_campaigns @relation(fields: [marketingCampaignId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "marketing_campaigns_on_customers_marketing_campaign_id_marketin")
+
+  @@id([customerId, marketingCampaignId], map: "marketing_campaigns_on_customers_customer_id_marketing_campaign")
+}
+
+model ordered_parts {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name           String
+  amount         Int
+  pricePerUnit Float    @db.Real @map("price_per_unit")
+  orderId       String   @db.Uuid @map("order_id")
+  billId        String?  @db.Uuid @map("bill_id")
+  updatedAtUtc DateTime        @default(dbgenerated("(now() AT TIME ZONE 'utc'::text)")) @db.Timestamp(6) @map("updated_at_utc")
+  createdAtUtc DateTime        @default(dbgenerated("(now() AT TIME ZONE 'utc'::text)")) @db.Timestamp(6) @map("created_at_utc")
+  bill           bills?   @relation(fields: [billId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "ordered_parts_bill_id_bills_id_fk")
+  order          orders   @relation(fields: [orderId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "ordered_parts_order_id_orders_id_fk")
+
+  @@index([billId], map: "ordered_parts_bill_index")
+  @@index([orderId], map: "ordered_parts_order_index")
+}
+
+model orders {
+  id             String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  orderNumber   Int @map("order_number")
+  orderDate     DateTime        @db.Timestamp(6) @map("order_date")
+  customerId    String          @db.Uuid @map("customer_id")
+  updatedAtUtc DateTime        @default(dbgenerated("(now() AT TIME ZONE 'utc'::text)")) @db.Timestamp(6) @map("updated_at_utc")
+  createdAtUtc DateTime        @default(dbgenerated("(now() AT TIME ZONE 'utc'::text)")) @db.Timestamp(6) @map("created_at_utc")
+  orderedParts  ordered_parts[]
+  customers      customers       @relation(fields: [customerId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "orders_customer_id_customers_id_fk")
+
+  @@index([customerId], map: "orders_customer_id_index")
+}
+
+enum customer_status_enum {
   ACTIVE
   INACTIVE
   DELETED
-}
-
-model CustomerEntity {
-  id                  String                    @id @db.Uuid
-  organizationName    String                    @map("organization_name")
-  slug                String                    @unique
-  status              CustomerEnum             @default(ACTIVE)
-  locale              String
-  createdAtUtc        DateTime?                 @map("created_at_utc")
-  updatedAtUtc        DateTime?                 @map("updated_at_utc")
-  address         AddressEntity?
-
-  @@map("customers")
-}
-
-model AddressEntity {
-  id           String         @id @db.Uuid
-  country      String
-  state        String?
-  postalCode   String         @map("postal_code")
-  city         String
-  address     String
-  createdAtUtc DateTime?      @map("created_at_utc")
-  updatedAtUtc DateTime?      @map("updated_at_utc")
-  customer     CustomerEntity @relation(fields: [customerId], references: [id])
-  customerId   String         @unique @map("customer_id")
-
-  @@map("customers_addresses")
 }

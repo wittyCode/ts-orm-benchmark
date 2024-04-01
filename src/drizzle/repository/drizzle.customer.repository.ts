@@ -1,17 +1,17 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { CustomerEntity } from '../../../benchmark-data/model/customer.entity';
-import { DrizzleAsyncProvider } from '../../drizzle.provider';
+import { CustomerEntity } from '../../benchmark-data/model/customer.entity';
+import { DrizzleAsyncProvider } from '../drizzle.provider';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
-import * as customersSchema from '../../schema/customers';
-import * as ordersSchema from '../../schema/orders';
-import { BenchmarkMetricsService } from '../../../benchmark-metrics/service/benchmark-metrics.service';
-import { benchmark } from '../../../benchmark-metrics/util/benchmark.helper';
-import { SearchConfig } from '../interfaces';
-import { runTypedSearchQuery, updatedEntity } from '../drizzle.helper';
+import * as customersSchema from '../schema/customers';
+import * as ordersSchema from '../schema/orders';
+import { BenchmarkMetricsService } from '../../benchmark-metrics/service/benchmark-metrics.service';
+import { benchmark } from '../../benchmark-metrics/util/benchmark.helper';
+import { SearchConfig } from './interfaces';
+import { runTypedSearchQuery, updatedEntity } from './drizzle.helper';
 import { ConfigService } from '@nestjs/config';
-import { customerAddress } from '../../schema/address';
-import { customers } from '../../schema/customers';
-import { CustomerRepository } from '../../../benchmark-data/repository/customer.repository';
+import { customerAddress } from '../schema/address';
+import { customers } from '../schema/customers';
+import { CustomerRepository } from '../../benchmark-data/repository/customer.repository';
 
 @Injectable()
 export class DrizzleCustomerRepository implements CustomerRepository {
@@ -102,7 +102,9 @@ export class DrizzleCustomerRepository implements CustomerRepository {
         with: {
           address: true,
           customersOrders: {
-            orderedParts: true,
+            with: {
+              orderedParts: true,
+            },
           },
           bills: true,
           marketingCampaigns: {
