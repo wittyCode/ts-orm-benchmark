@@ -5,16 +5,12 @@ import { PrismaService } from '../prisma.service';
 
 @Injectable()
 export class PrismaBillsRepository implements BillsRepository {
+  constructor(private readonly prismaService: PrismaService) {}
 
-  constructor(
-    private readonly prismaService: PrismaService,
-  ) { }
-
-  async upsertManyBills(bills: BillEntity[]): Promise<void> { }
+  async upsertManyBills(bills: BillEntity[]): Promise<void> {}
 
   async findAll(): Promise<BillEntity[]> {
-    const result = await this.prismaService.bills.findMany({});
-    return result as BillEntity[];
+    return (await this.prismaService.bills.findMany({})) as BillEntity[];
   }
 
   async drop(): Promise<void> {

@@ -58,7 +58,7 @@ export class PrismaCustomerRepository implements CustomerRepository {
   }
 
   async findAll(): Promise<CustomerEntity[]> {
-    const result = await this.prismaService.customers.findMany({
+    return (await this.prismaService.customers.findMany({
       include: {
         customersAddress: true,
         orders: {
@@ -69,8 +69,7 @@ export class PrismaCustomerRepository implements CustomerRepository {
         bills: true,
         marketingCampaignsOnCustomers: true,
       },
-    });
-    return result as CustomerEntity[];
+    })) as CustomerEntity[];
   }
 
   async findById(customerId: string): Promise<CustomerEntity> {

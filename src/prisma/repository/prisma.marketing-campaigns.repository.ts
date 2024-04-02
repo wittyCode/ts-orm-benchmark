@@ -22,12 +22,11 @@ export class PrismaMarketingCampaignRepository
   ): Promise<void> {}
 
   async findAll(): Promise<MarketingCampaignEntity[]> {
-    const result = await this.prismaService.marketing_campaigns.findMany({
+    return (await this.prismaService.marketing_campaigns.findMany({
       include: {
         marketingCampaignsOnCustomers: true,
       },
-    });
-    return result as MarketingCampaignEntity[];
+    })) as MarketingCampaignEntity[];
   }
 
   async drop(): Promise<void> {

@@ -8,25 +8,23 @@ import { PrismaService } from '../prisma.service';
 
 @Injectable()
 export class PrismaOrdersRepository implements OrdersRepository {
-
-  constructor(private readonly prismaService: PrismaService) { }
+  constructor(private readonly prismaService: PrismaService) {}
 
   async upsertManyOrdersFromCustomersAsChunks(
     customers: CustomerEntity[],
-  ): Promise<void> { }
+  ): Promise<void> {}
 
   async updateOrderedPartWithBillId(
     orderedPartsEntities: OrderedPartEntity[],
     bills: BillEntity[],
-  ): Promise<void> { }
+  ): Promise<void> {}
 
   async findAll(): Promise<OrderEntity[]> {
-    const result = await this.prismaService.orders.findMany({
+    return (await this.prismaService.orders.findMany({
       include: {
         orderedParts: true,
-      }
-    });
-    return result as OrderEntity[];
+      },
+    })) as OrderEntity[];
   }
 
   async drop(): Promise<void> {
