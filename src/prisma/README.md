@@ -15,16 +15,15 @@ Since I started with Drizzle and had an existing database and wanted to try out 
 npx prisma db pull
 ```
 
-to populate the schema.prisma file from the existing database. Sadly not all relations were created correctly.
+to populate the schema.prisma file from the existing database. Sadly not all relations were created correctly, so manual repair work was needed to get to the intended data model and it's contents.
 
 Afterwards the client code needs to be generated:
 ```bash
 npx prisma generate
 ```
-These schemas must then be used as param in the provider so they are accessible in the application at runtime.
 For implementation of inserts and queries, see the Repository implementations in the repository directory.
 For inserting across multiple tables transactions need to be used. You can find an example in
-the [CustomerDrizzleRepository](./repository/customer/customer.drizzle.repository.ts)
+the [CustomerPrismaRepository](./repository/customer.prisma.repository.ts)
 
 ## Usage
 

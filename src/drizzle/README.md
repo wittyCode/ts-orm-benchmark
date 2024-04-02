@@ -12,7 +12,7 @@ Tables are defined in the schemas file in the schema directory.
 These schemas must then be used as param in the provider so they are accessible in the application at runtime.
 For implementation of inserts and queries, see the Repository implementations in the repository directory.
 For inserting across multiple tables transactions need to be used. You can find an example in
-the [CustomerDrizzleRepository](./repository/customer/customer.drizzle.repository.ts)
+the [CustomerDrizzleRepository](./repository/customer.drizzle.repository.ts)
 
 ## Usage
 
@@ -43,3 +43,5 @@ After the learning curve writing drizzle is actually quite satisfying due to the
 possible and therefore automatically learning more about SQL. Somehow only the relations syntax is a bit weird to me, and I always needed to look it up. But maybe that's just me - and when you're used to it, it should definitely become more easy.
 
 I did not find a simple way to update multiple entities in a single transaction, but a few days ago on the official Drizzle docs a workaround/fix was provided by using [Upserts](https://orm.drizzle.team/learn/guides/upsert)
+
+With nested selects drizzle doesn't show you syntax errors, when you include the nested tables wrong. Write an integration test or print your query result on the first run to check if you did it right.
