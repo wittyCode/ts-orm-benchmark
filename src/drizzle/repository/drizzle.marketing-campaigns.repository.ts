@@ -14,21 +14,20 @@ import { customers } from '../schema/customers';
 import { customerAddress } from '../schema/address';
 import { eq } from 'drizzle-orm';
 import { CampaignReportEntity } from '../../benchmark-data/model/campaign-report.entity';
-import { JoinedReport } from './marketing-campaign.helpers';
 import { ConfigService } from '@nestjs/config';
+import { JoinedReport } from './marketing-campaign.helpers';
 
 const campaignChunkSizeKey = 'CAMPAIGNS_CHUNK_SIZE';
 
 @Injectable()
 export class DrizzleMarketingCampaignsRepository
-  implements MarketingCampaignsRepository
-{
+  implements MarketingCampaignsRepository {
   constructor(
     @Inject(DrizzleAsyncProvider)
     private readonly drizzle: NodePgDatabase<typeof campaignSchema>,
     private readonly benchmarkMetricsService: BenchmarkMetricsService,
     private readonly configService: ConfigService,
-  ) {}
+  ) { }
 
   async upsertManyMarketingCampaigns(
     marketingCampaigns: MarketingCampaignEntity[],
@@ -163,7 +162,7 @@ export class DrizzleMarketingCampaignsRepository
     }, {});
     const resultArray = Object.values(result) as CampaignReportEntity[];
 
-    //resultArray.forEach((entry) => console.log(JSON.stringify(entry)));
+    console.log(resultArray[0]);
     return resultArray;
   }
 }

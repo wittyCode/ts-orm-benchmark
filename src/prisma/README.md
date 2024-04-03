@@ -15,7 +15,9 @@ Since I started with Drizzle and had an existing database and wanted to try out 
 npx prisma db pull
 ```
 
-to populate the schema.prisma file from the existing database. Sadly not all relations were created correctly, so manual repair work was needed to get to the intended data model and it's contents.
+to populate the schema.prisma file from the existing database. 
+Sadly not all relations were created correctly, so manual repair work was needed to get to the intended data model and it's contents.
+Maybe it would have been easier to just create the migrations manually instead of trying to pull - because manually checking what went wrong on pull was tedious.
 
 Afterwards the client code needs to be generated:
 ```bash
@@ -45,12 +47,5 @@ These commands are defined in the [package.json](../../package.json) file, so ch
 
 ## Opinion
 
-Drizzle has a steeper learning curve than some of the alternatives, e.g. Prisma.
-Also it does not provide full-fledged type support when using your own entities to improve maintainability by providing
-an abstraction from the concrete ORM used. Using the _as_ type assertion helps, but provided me with some instances
-where I had to cast to unknown first - maybe there's an easier way, if there is, please tell me!
-
-After the learning curve writing drizzle is actually quite satisfying due to the ability to stay as close to SQL as
-possible and therefore automatically learning more about SQL. Somehow only the relations syntax is a bit weird to me, and I always needed to look it up. But maybe that's just me - and when you're used to it, it should definitely become more easy.
-
-I did not find a simple way to update multiple entities in a single transaction, but a few days ago on the official Drizzle docs a workaround/fix was provided by using [Upserts](https://orm.drizzle.team/learn/guides/upsert)
+initial learning curve easier since everything is based on querybuilder with nice syntax;
+joins with desired result format hard because (seemingly) no easy way for projections exist - so more mapping functions need to be in place

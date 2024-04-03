@@ -3,9 +3,13 @@ import {
   MarketingCampaignToCustomer,
   MarketingCampaignsRepository,
 } from '../../benchmark-data/repository/marketing-campaigns.repository';
-import { CampaignReportEntity } from '../../benchmark-data/model/campaign-report.entity';
+import {
+  CampaignReportCustomerEntity,
+  CampaignReportEntity,
+} from '../../benchmark-data/model/campaign-report.entity';
 import { MarketingCampaignEntity } from '../../benchmark-data/model/marketing-campaign.entity';
 import { PrismaService } from '../prisma.service';
+import { AddressEntity } from '../../benchmark-data/model/address.entity';
 
 @Injectable()
 export class PrismaMarketingCampaignRepository
@@ -35,6 +39,64 @@ export class PrismaMarketingCampaignRepository
   }
 
   async findAddressesInCampaigns(): Promise<CampaignReportEntity[]> {
-    return [];
+    const result = await this.prismaService.marketing_campaigns.findMany({
+      select: {
+        id: true,
+        name: true,
+        marketingCampaignsOnCustomers: {
+          select: {
+            customers: {
+              select: {
+                id: true,
+                companyName: true,
+                customersAddress: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const reports = result.map((it) => this.mapRowToCampaignReportEntity(it));
+
+    return reports;
   }
+
+  private mapRowToCampaignReportEntity(
+    row: Partial<JoinedReport>,
+  ): CampaignReportEntity {
+    return {
+      marketingCampaignId: row.id,
+      marketingCampaignName: row.name,
+      customers: this.mapCustomerReports(row.marketingCampaignsOnCustomers),
+    };
+  }
+
+  private mapCustomerReports(
+    customers: CustomerContainer[],
+  ): CampaignReportCustomerEntity[] {
+    return customers.map((customer) => {
+      return {
+        customerId: customer.customers.id,
+        customerName: customer.customers.companyName,
+        customerAddress: customer.customers.customersAddress,
+      };
+    });
+  }
+}
+
+class JoinedReport {
+  id: string;
+  name: string;
+  marketingCampaignsOnCustomers: CustomerContainer[];
+}
+
+class CustomerContainer {
+  customers: CustomerReport;
+}
+
+class CustomerReport {
+  id: string;
+  companyName: string;
+  customersAddress: AddressEntity;
 }

@@ -93,8 +93,9 @@ a lot.
 
 by order of current priority (subject to change):
 
-1. add documentation about methodology, benchmark data model and ways to configure it
+1. improve documentation about intent, methodology and configuration
 2. add Prisma implementation of repositories for first real comparison of performance
+3. add count as field for the report join query to check how easy aggregation and projection can be combined (in prisma it seems to just be adding _count https://www.prisma.io/docs/orm/prisma-client/queries/relation-queries#relation-count)
 3. Check and compare with Prisma experimental feature that actually joins data correctly
 4. implement parallelism to be able to simulate multiple clients accessing the db at the same time, at least for READ queries, since that is a more realistic use-case than heavy inserts/updates at the same time - later also parallel inserts can be included
 5. updated_at_utc update trigger in drizzle
@@ -102,6 +103,7 @@ by order of current priority (subject to change):
 unordered:
 
 - The current implementation runs into Heapspace memory issues due to the dataset being completely generated in advance and therefore not eligible for garbage collection. We could look into generating test data in chunks as we do for inserting.
+- compare performance. keep stuff in mind like running multiple iterations and ordering them by iteration to see if caching helps or if implementations run into worse performance in later runs (e.g. drizzle seemed to actually get faster after a few runs before stabilizing but prisma seemed stable or actually getting slightly worse - but this currently is just anecdotal, do a real test on this)
 - Maybe implement a table with a lot of columns to see how inserts there scale when a lot of columns are involved.
 - add Frontend to actually look at results - this will be a fun project to dive into React, Vite and tailwind-css
 - support the following ORMs and query builders:
