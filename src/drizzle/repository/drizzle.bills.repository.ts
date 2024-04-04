@@ -19,9 +19,9 @@ export class DrizzleBillsRepository implements BillsRepository {
     // WARNING: there seems to be an issue with big transaction sizes / many inserts, for 10_000 records it just breaks with
     // bind message has 4464 parameters but 0 parameters or something like that
     // or with "Maximum call stack size exceeded" error
-    // TODO: think if this can be parallelized with Promise.all
-    const expectedChunks = Math.ceil(bills.length / 1000);
+    // TODO: think if this can be parallelized with Promise.all -> but maybe that's not in scope of this benchmark since this would be an optimization
     const chunkSize = 1000;
+    const expectedChunks = Math.ceil(bills.length / chunkSize);
     for (let i = 0; i < bills.length; i += chunkSize) {
       const chunk = bills.slice(i, i + chunkSize);
       await benchmark(

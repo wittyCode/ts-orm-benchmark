@@ -17,7 +17,6 @@ export class PrismaCustomerRepository implements CustomerRepository {
     throw new Error('Method not implemented.');
   }
 
-  slug: string;
   async upsertManyCustomers(customers: CustomerEntity[]): Promise<void> {
     // TODO: benchmarking and batching as in drizzle => this currently is just a simple for loop
     let iteration = 0;

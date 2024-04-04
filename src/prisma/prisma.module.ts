@@ -5,12 +5,13 @@ import { PrismaCustomerRepository } from './repository/prisma.customer.repositor
 import { PrismaBillsRepository } from './repository/prisma.bills.repository';
 import { PrismaMarketingCampaignRepository } from './repository/prisma.marketing-campaigns.repository';
 import { PrismaOrdersRepository } from './repository/prisma.orders.repository';
+import { BenchmarkMetricsModule } from '../benchmark-metrics/benchmark-metrics.module';
 
 /**
  * Module to encapsulate database access, currently with Prisma ORM
  */
 @Module({
-  imports: [LoggerModule],
+  imports: [BenchmarkMetricsModule, LoggerModule],
   providers: [
     PrismaService,
     PrismaCustomerRepository,
