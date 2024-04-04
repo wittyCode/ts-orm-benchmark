@@ -58,18 +58,34 @@ export class PrismaCustomerRepository implements CustomerRepository {
   }
 
   async findAll(): Promise<CustomerEntity[]> {
-    return (await this.prismaService.customers.findMany({
-      include: {
-        customersAddress: true,
-        orders: {
+    const chunkSize = 1000;
+    const countInDb = await this.prismaService.customers.count();
+    const expectedChunks = Math.ceil(countInDb / chunkSize);
+    const result = [];
+    for (let i = 0; i <= countInDb; i += chunkSize) {
+      console.log(
+        `Prisma reading customer chunk ${
+          Math.ceil(i / chunkSize) + 1
+        } of ${expectedChunks}`,
+      );
+      result.push(
+        await this.prismaService.customers.findMany({
           include: {
-            orderedParts: true,
+            customersAddress: true,
+            orders: {
+              include: {
+                orderedParts: true,
+              },
+            },
+            bills: true,
+            marketingCampaignsOnCustomers: true,
           },
-        },
-        bills: true,
-        marketingCampaignsOnCustomers: true,
-      },
-    })) as CustomerEntity[];
+          skip: i,
+          take: chunkSize,
+        }),
+      );
+    }
+    return result.flat() as CustomerEntity[];
   }
 
   async findById(customerId: string): Promise<CustomerEntity> {

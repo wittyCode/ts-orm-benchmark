@@ -5,6 +5,7 @@ import { CreateMockService } from '../../mock-creator/service/create-mock.servic
 import { benchmark } from '../../benchmark-metrics/util/benchmark.helper';
 import { ConfigService } from '@nestjs/config';
 import { BenchmarkInputRepositoryDelegate } from '../../benchmark-data/repository/benchmark-input-repository-delegate';
+import { BenchmarkType } from './benchmark-orchestrator.service';
 
 export const marketingCampaignDivisorKey = 'MARKETING_CAMPAIGN_DIVISOR';
 export const customersPerCampaignKey = 'MARKETING_CAMPAINGS_TO_CUSTOMER_FACTOR';
@@ -29,9 +30,11 @@ export class WriteBenchmarkService {
     this.benchmarkService.resultMap.clear();
   }
 
+  // TODO: add dbDriver as param to add it as Key to result map entry
   async runWriteBenchmark(
     repositories: BenchmarkInputRepositoryDelegate,
     customerSize: number,
+    benchmarkType: BenchmarkType,
   ) {
     const startTime = performance.now();
     this.loggerService.log(
@@ -106,7 +109,7 @@ export class WriteBenchmarkService {
     // 2. insert customers with address, orders
     this.loggerService.log('Inserting customers');
     await benchmark(
-      'insertAllCustomers',
+      `${benchmarkType} insertAllCustomers`,
       repositories.customerRepository.upsertManyCustomers.bind(
         repositories.customerRepository,
       ),
@@ -117,7 +120,7 @@ export class WriteBenchmarkService {
     // 3. insert orders with orderedParts
     this.loggerService.log('Inserting orders');
     await benchmark(
-      'insertAllOrders',
+      `${benchmarkType} insertAllOrders`,
       repositories.ordersRepository.upsertManyOrdersFromCustomersAsChunks.bind(
         repositories.ordersRepository,
       ),
@@ -128,7 +131,7 @@ export class WriteBenchmarkService {
     // 4. insert bills
     this.loggerService.log('Inserting bills');
     await benchmark(
-      'insertAllBills',
+      `${benchmarkType} insertAllBills`,
       repositories.billsRepository.upsertManyBills.bind(
         repositories.billsRepository,
       ),
@@ -140,7 +143,7 @@ export class WriteBenchmarkService {
     this.loggerService.log('Updating ordered part data entries with billId');
     const orderedParts = ordersFlat.map((entity) => entity.orderedParts).flat();
     await benchmark(
-      'updateOrderedPartsWithBillIds',
+      `${benchmarkType} updateOrderedPartsWithBillIds`,
       repositories.ordersRepository.updateOrderedPartWithBillId.bind(
         repositories.ordersRepository,
       ),
@@ -152,7 +155,7 @@ export class WriteBenchmarkService {
     // 5. insert marketing campaigns
     this.loggerService.log('Inserting marketing campaigns');
     await benchmark(
-      'insertAllMarketingCampaigns',
+      `${benchmarkType} insertAllMarketingCampaigns`,
       repositories.marketingCampaignsRepository.upsertManyMarketingCampaigns.bind(
         repositories.marketingCampaignsRepository,
       ),
@@ -165,7 +168,7 @@ export class WriteBenchmarkService {
       'Inserting joinTable entries for marketing campaigns to customers',
     );
     await benchmark(
-      'insertAllJoinTableEntries',
+      `${benchmarkType} insertAllJoinTableEntries`,
       repositories.marketingCampaignsRepository.linkMarketingCampaignsToCustomers.bind(
         repositories.marketingCampaignsRepository,
       ),

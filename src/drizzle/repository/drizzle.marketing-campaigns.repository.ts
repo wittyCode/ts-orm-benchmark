@@ -161,9 +161,6 @@ export class DrizzleMarketingCampaignsRepository
       }
       return acc;
     }, {});
-    const resultArray = Object.values(result) as CampaignReportEntity[];
-
-    console.log(resultArray[0]);
-    return resultArray;
+    return Object.values(result) as CampaignReportEntity[];
   }
 }

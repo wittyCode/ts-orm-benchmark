@@ -7,6 +7,7 @@ import { benchmark } from '../../benchmark-metrics/util/benchmark.helper';
 import { BenchmarkMetricsService } from '../../benchmark-metrics/service/benchmark-metrics.service';
 import { LoggerService } from '../../logger/logger.service';
 import { BenchmarkInputRepositoryDelegate } from '../../benchmark-data/repository/benchmark-input-repository-delegate';
+import { BenchmarkType } from './benchmark-orchestrator.service';
 
 @Injectable()
 export class ReadBenchmarkService {
@@ -15,8 +16,10 @@ export class ReadBenchmarkService {
     private readonly loggerService: LoggerService,
   ) {}
 
-  // TODO : add DB driver to keys for benchmark result map
-  async runReadBenchmark(repositories: BenchmarkInputRepositoryDelegate) {
+  async runReadBenchmark(
+    repositories: BenchmarkInputRepositoryDelegate,
+    benchmarkType: BenchmarkType,
+  ) {
     const startTime = performance.now();
     //this.loggerService.log(
     //  `Benchmark for reads started with size ${customerSize}`,
@@ -25,57 +28,64 @@ export class ReadBenchmarkService {
     // 1. find all customers
     this.loggerService.log('Reading customers');
     const customers = await benchmark<CustomerEntity[]>(
-      `findAllCustomers`,
+      `${benchmarkType} findAllCustomers`,
       repositories.customerRepository.findAll.bind(
         repositories.customerRepository,
       ),
       this.benchmarkService.resultMap,
     );
-    this.loggerService.log(`Found ${customers.length} customers`);
 
-    // 3. find all orders with ordered parts
+    // 2. find all orders with ordered parts
     this.loggerService.log('Reading orders');
     const orders = await benchmark<OrderEntity[]>(
-      'findAllOrders',
+      `${benchmarkType} findAllOrders`,
       repositories.ordersRepository.findAll.bind(repositories.ordersRepository),
       this.benchmarkService.resultMap,
     );
-    this.loggerService.log(`Found ${orders.length} orders`);
 
-    // 4. find all bills
+    // 3. find all bills
     this.loggerService.log('Reading bills');
     const bills = await benchmark<BillEntity[]>(
-      'findAllBills',
+      `${benchmarkType} findAllBills`,
       repositories.billsRepository.findAll.bind(repositories.billsRepository),
       this.benchmarkService.resultMap,
     );
-    this.loggerService.log(`Found ${bills.length} bills`);
 
-    // 5. find all marketing campaigns
+    // 4. find all marketing campaigns
     this.loggerService.log('Reading marketing campaigns');
     const marketingCampaigns = await benchmark<MarketingCampaignEntity[]>(
-      'findAllMarketingCampaigns',
+      `${benchmarkType} findAllMarketingCampaigns`,
       repositories.marketingCampaignsRepository.findAll.bind(
         repositories.marketingCampaignsRepository,
       ),
       this.benchmarkService.resultMap,
     );
-    this.loggerService.log(
-      `Found ${marketingCampaigns.length} marketing campaigns`,
-    );
 
-    // 6. reporting query: find all customerAddresses in a marketingCampaign
+    // 5. reporting query: find all customerAddresses in a marketingCampaign
     this.loggerService.log('Reading reports for marketing campaigns');
     const reports = await benchmark<any[]>(
-      'reportingMarketingCampaigns',
+      `${benchmarkType} reportingMarketingCampaigns`,
       repositories.marketingCampaignsRepository.findAddressesInCampaigns.bind(
         repositories.marketingCampaignsRepository,
       ),
       this.benchmarkService.resultMap,
     );
+
+    // 6. log results statistics
+    this.loggerService.log(`Found ${customers.length} customers`);
+    //console.log(JSON.stringify(customers[0]));
+    this.loggerService.log(`Found ${orders.length} orders`);
+    //console.log(JSON.stringify(orders[0]));
+    this.loggerService.log(`Found ${bills.length} bills`);
+    //console.log(JSON.stringify(bills[0]));
+    this.loggerService.log(
+      `Found ${marketingCampaigns.length} marketing campaigns`,
+    );
+    //console.log(JSON.stringify(marketingCampaigns[0]));
     this.loggerService.log(
       `Found ${reports.length} reports for marketing campaigns`,
     );
+    //console.log(JSON.stringify(reports[0]));
 
     const duration = performance.now() - startTime;
     return duration;

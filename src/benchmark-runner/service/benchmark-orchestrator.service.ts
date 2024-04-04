@@ -24,7 +24,6 @@ export class BenchmarkOrchestratorService {
     private readonly loggerService: LoggerService,
   ) {}
 
-  // TODO: make db driver param and use correct repo for reset
   async resetBenchmark(dbDriver: BenchmarkType): Promise<void> {
     this.loggerService.log('Resetting benchmark');
     const repositories =
@@ -47,6 +46,7 @@ export class BenchmarkOrchestratorService {
       await this.writeBenchmarkService.runWriteBenchmark(
         repositories,
         customerSize,
+        dbDriver,
       );
 
     this.loggerService.log(
@@ -60,18 +60,20 @@ export class BenchmarkOrchestratorService {
   }
 
   async runReadBenchmark(
-    dbdriver: BenchmarkType,
+    dbDriver: BenchmarkType,
     // TODO: make read batchsize part of this
-    //customersize: number,
+    //customerSize: number,
   ): Promise<number> {
-    this.loggerService.log(`benchmark for ${dbdriver} started!`);
+    this.loggerService.log(`benchmark for ${dbDriver} started!`);
     const repositories =
-      this.benchmarkRepositoryFactoryService.createRepositoryDelegate(dbdriver);
-    const duration =
-      await this.readBenchmarkService.runReadBenchmark(repositories);
+      this.benchmarkRepositoryFactoryService.createRepositoryDelegate(dbDriver);
+    const duration = await this.readBenchmarkService.runReadBenchmark(
+      repositories,
+      dbDriver,
+    );
     this.loggerService.log(
       // TODO: conditional pretty printing depending on duration (ms, s, min)
-      `benchmark for ${dbdriver} finished in ${Math.round(
+      `benchmark for ${dbDriver} finished in ${Math.round(
         duration / 1000,
       )} seconds!`,
     );

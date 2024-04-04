@@ -10,7 +10,25 @@ export class PrismaBillsRepository implements BillsRepository {
   async upsertManyBills(bills: BillEntity[]): Promise<void> {}
 
   async findAll(): Promise<BillEntity[]> {
-    return (await this.prismaService.bills.findMany({})) as BillEntity[];
+    const chunkSize = 1000;
+    const countInDb = await this.prismaService.bills.count();
+    const expectedChunks = Math.ceil(countInDb / chunkSize);
+    const result = [];
+    for (let i = 0; i <= countInDb; i += chunkSize) {
+      console.log(
+        `Prisma reading bills chunk ${
+          Math.ceil(i / chunkSize) + 1
+        } of ${expectedChunks}`,
+      );
+      result.push(
+        await this.prismaService.bills.findMany({
+          skip: i,
+          take: chunkSize,
+        }),
+      );
+    }
+
+    return result.flat() as BillEntity[];
   }
 
   async drop(): Promise<void> {

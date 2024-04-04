@@ -39,27 +39,43 @@ export class PrismaMarketingCampaignRepository
   }
 
   async findAddressesInCampaigns(): Promise<CampaignReportEntity[]> {
-    const result = await this.prismaService.marketing_campaigns.findMany({
-      select: {
-        id: true,
-        name: true,
-        marketingCampaignsOnCustomers: {
+    const chunkSize = 1000;
+    const countInDb = await this.prismaService.marketing_campaigns.count();
+    const expectedChunks = Math.ceil(countInDb / chunkSize);
+    const result = [];
+    for (let i = 0; i <= countInDb; i += chunkSize) {
+      console.log(
+        `Prisma reading marketing Campaign chunk ${
+          Math.ceil(i / chunkSize) + 1
+        } of ${expectedChunks}`,
+      );
+      result.push(
+        await this.prismaService.marketing_campaigns.findMany({
           select: {
-            customers: {
+            id: true,
+            name: true,
+            marketingCampaignsOnCustomers: {
               select: {
-                id: true,
-                companyName: true,
-                customersAddress: true,
+                customers: {
+                  select: {
+                    id: true,
+                    companyName: true,
+                    customersAddress: true,
+                  },
+                },
               },
             },
           },
-        },
-      },
-    });
+          skip: i,
+          take: chunkSize,
+        }),
+      );
+    }
+    const reports = result
+      .flat()
+      .map((it) => this.mapRowToCampaignReportEntity(it));
 
-    const reports = result.map((it) => this.mapRowToCampaignReportEntity(it));
-
-    return reports;
+    return reports as CampaignReportEntity[];
   }
 
   private mapRowToCampaignReportEntity(

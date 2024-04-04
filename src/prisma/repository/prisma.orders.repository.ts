@@ -20,11 +20,28 @@ export class PrismaOrdersRepository implements OrdersRepository {
   ): Promise<void> {}
 
   async findAll(): Promise<OrderEntity[]> {
-    return (await this.prismaService.orders.findMany({
-      include: {
-        orderedParts: true,
-      },
-    })) as OrderEntity[];
+    const chunkSize = 100;
+    const countInDb = await this.prismaService.orders.count();
+    const expectedChunks = Math.ceil(countInDb / chunkSize);
+    const result = [];
+    for (let i = 0; i <= countInDb; i += chunkSize) {
+      console.log(
+        `Prisma reading order chunk ${
+          Math.ceil(i / chunkSize) + 1
+        } of ${expectedChunks}`,
+      );
+      result.push(
+        await this.prismaService.orders.findMany({
+          include: {
+            orderedParts: true,
+          },
+          skip: i,
+          take: chunkSize,
+        }),
+      );
+    }
+
+    return result.flat() as OrderEntity[];
   }
 
   async drop(): Promise<void> {

@@ -107,7 +107,7 @@ by order of current priority (subject to change):
 unordered:
 
 - The current implementation runs into Heapspace memory issues due to the dataset being completely generated in advance and therefore not eligible for garbage collection. We could look into generating test data in chunks as we do for inserting.
-- compare performance. keep stuff in mind like running multiple iterations and ordering them by iteration to see if caching helps or if implementations run into worse performance in later runs (e.g. drizzle seemed to actually get faster after a few runs before stabilizing but prisma seemed stable or actually getting slightly worse - but this currently is just anecdotal, do a real test on this)
+- compare performance. keep stuff in mind like running multiple iterations and ordering them by iteration to see if caching helps or if implementations run into worse performance in later runs (e.g. drizzle seemed to actually get faster after a few runs before stabilizing but prisma seemed stable or actually getting slightly worse - but this currently is just anecdotal, do a real test on this) - also compare not only overall performance but look into different query clusters!
 - Maybe implement a table with a lot of columns to see how inserts there scale when a lot of columns are involved. also do projection query selcting only a couple of columns to check if some ORMs really have bad performance due to full loads and doing the projection in memory
 - add Frontend to actually look at results - this will be a fun project to dive into React, Vite and tailwind-css
 - support the following ORMs and query builders:
