@@ -1,4 +1,4 @@
-import { AddressEntity } from "../../benchmark-data/model/address.entity";
+import { AddressEntity } from '../../benchmark-data/model/address.entity';
 
 export class JoinedReport {
   campaignId: string;

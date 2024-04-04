@@ -99,7 +99,7 @@ export class WriteBenchmarkService {
       ${orderedPartsFlatCount} ordered part data entries created!
       ${billEntities.length} bill entities created!
       ${marketingCampaignCount} marketing campaign entities created!
-      ${customersPerCampaignEntities} joinTable entities between customers and marketingCampaigns created!
+      ${customersPerCampaignEntities.length} joinTable entities between customers and marketingCampaigns created!
       `,
     );
 

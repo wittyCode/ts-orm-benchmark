@@ -49,3 +49,5 @@ These commands are defined in the [package.json](../../package.json) file, so ch
 
 initial learning curve easier since everything is based on querybuilder with nice syntax;
 joins with desired result format hard because (seemingly) no easy way for projections exist - so more mapping functions need to be in place
+
+while drizzle had a problem with big inserts, prisma is not able to handle "big" reads - https://github.com/prisma/prisma/issues/13864. will also need to implement chunked reads with cursor/window here.

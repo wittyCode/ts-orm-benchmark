@@ -21,13 +21,14 @@ const campaignChunkSizeKey = 'CAMPAIGNS_CHUNK_SIZE';
 
 @Injectable()
 export class DrizzleMarketingCampaignsRepository
-  implements MarketingCampaignsRepository {
+  implements MarketingCampaignsRepository
+{
   constructor(
     @Inject(DrizzleAsyncProvider)
     private readonly drizzle: NodePgDatabase<typeof campaignSchema>,
     private readonly benchmarkMetricsService: BenchmarkMetricsService,
     private readonly configService: ConfigService,
-  ) { }
+  ) {}
 
   async upsertManyMarketingCampaigns(
     marketingCampaigns: MarketingCampaignEntity[],
