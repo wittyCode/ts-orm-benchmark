@@ -16,8 +16,7 @@ import { eq } from 'drizzle-orm';
 import { CampaignReportEntity } from '../../benchmark-data/model/campaign-report.entity';
 import { ConfigService } from '@nestjs/config';
 import { JoinedReport } from './marketing-campaign.helpers';
-
-const campaignChunkSizeKey = 'CAMPAIGNS_CHUNK_SIZE';
+import { campaignChunkSizeKey } from '../../config.constants';
 
 @Injectable()
 export class DrizzleMarketingCampaignsRepository
@@ -36,7 +35,6 @@ export class DrizzleMarketingCampaignsRepository
     // WARNING: there seems to be an issue with big transaction sizes / many inserts, for 10_000 records it just breaks with
     // bind message has 4464 parameters but 0 parameters or something like that
     // or with "Maximum call stack size exceeded" error
-    // TODO: think if this can be parallelized with Promise.all
     const chunkSize =
       parseInt(this.configService.get<string>(campaignChunkSizeKey)) || 1000;
     const expectedChunks = Math.ceil(marketingCampaigns.length / chunkSize);

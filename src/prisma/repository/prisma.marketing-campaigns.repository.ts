@@ -10,12 +10,20 @@ import {
 import { MarketingCampaignEntity } from '../../benchmark-data/model/marketing-campaign.entity';
 import { PrismaService } from '../prisma.service';
 import { AddressEntity } from '../../benchmark-data/model/address.entity';
+import { benchmark } from '../../benchmark-metrics/util/benchmark.helper';
+import { BenchmarkMetricsService } from '../../benchmark-metrics/service/benchmark-metrics.service';
+import { ConfigService } from '@nestjs/config';
+import { campaignChunkSizeKey } from '../../config.constants';
 
 @Injectable()
 export class PrismaMarketingCampaignRepository
   implements MarketingCampaignsRepository
 {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly benchmarkMetricsService: BenchmarkMetricsService,
+    private readonly configService: ConfigService,
+  ) {}
 
   async linkMarketingCampaignsToCustomers(
     marketingCampaignsToCustomer: MarketingCampaignToCustomer[],
@@ -23,7 +31,29 @@ export class PrismaMarketingCampaignRepository
 
   async upsertManyMarketingCampaigns(
     marketingCampaigns: MarketingCampaignEntity[],
-  ): Promise<void> {}
+  ): Promise<void> {
+    const chunkSize =
+      parseInt(this.configService.get<string>(campaignChunkSizeKey)) || 1000;
+    const expectedChunks = Math.ceil(marketingCampaigns.length / chunkSize);
+    for (let i = 0; i < marketingCampaigns.length; i += chunkSize) {
+      const chunk = marketingCampaigns.slice(i, i + chunkSize);
+      await benchmark(
+        'PRISMA: insert marketing campaign chunks',
+        this.upsertManyChunks.bind(this),
+        this.benchmarkMetricsService.resultMap,
+        chunk,
+      );
+      console.log(`chunk ${i / chunkSize + 1} of ${expectedChunks} done!`);
+    }
+  }
+
+  private async upsertManyChunks(
+    marketingCampaigns: MarketingCampaignEntity[],
+  ): Promise<void> {
+    await this.prismaService.marketing_campaigns.createMany({
+      data: marketingCampaigns,
+    });
+  }
 
   async findAll(): Promise<MarketingCampaignEntity[]> {
     return (await this.prismaService.marketing_campaigns.findMany({

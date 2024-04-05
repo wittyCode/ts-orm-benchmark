@@ -3,9 +3,9 @@ import { LoggerModule } from '../logger/logger.module';
 import { PrismaService } from './prisma.service';
 import { PrismaCustomerRepository } from './repository/prisma.customer.repository';
 import { PrismaBillsRepository } from './repository/prisma.bills.repository';
-import { PrismaMarketingCampaignRepository } from './repository/prisma.marketing-campaigns.repository';
 import { PrismaOrdersRepository } from './repository/prisma.orders.repository';
 import { BenchmarkMetricsModule } from '../benchmark-metrics/benchmark-metrics.module';
+import { PrismaMarketingCampaignRepository } from './repository/prisma.marketing-campaigns.repository';
 
 /**
  * Module to encapsulate database access, currently with Prisma ORM

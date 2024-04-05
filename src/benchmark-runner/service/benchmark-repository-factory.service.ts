@@ -7,8 +7,8 @@ import { DrizzleOrderRepository } from '../../drizzle/repository/drizzle.order.r
 import { DrizzleMarketingCampaignsRepository } from '../../drizzle/repository/drizzle.marketing-campaigns.repository';
 import { PrismaCustomerRepository } from '../../prisma/repository/prisma.customer.repository';
 import { PrismaBillsRepository } from '../../prisma/repository/prisma.bills.repository';
-import { PrismaMarketingCampaignRepository } from '../../prisma/repository/prisma.marketing-campaigns.repository';
 import { PrismaOrdersRepository } from '../../prisma/repository/prisma.orders.repository';
+import { PrismaMarketingCampaignRepository } from '../../prisma/repository/prisma.marketing-campaigns.repository';
 
 @Injectable()
 export class BenchmarkRepositoryFactoryService {
