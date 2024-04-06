@@ -21,7 +21,7 @@ model bills {
 
 model customers {
   id                               String                             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  companyName                      String?                            @map("company_name")
+  companyName                      String                            @map("company_name")
   customerStatus                   customer_status_enum?              @default(ACTIVE) @map("customer_status")
   createdAtUtc DateTime        @default(dbgenerated("(now() AT TIME ZONE 'utc'::text)")) @db.Timestamp(6) @map("created_at_utc")
   updatedAtUtc DateTime        @default(dbgenerated("(now() AT TIME ZONE 'utc'::text)")) @db.Timestamp(6) @map("updated_at_utc")

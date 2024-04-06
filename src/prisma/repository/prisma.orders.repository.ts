@@ -20,6 +20,7 @@ export class PrismaOrdersRepository implements OrdersRepository {
   ): Promise<void> {}
 
   async findAll(): Promise<OrderEntity[]> {
+    // WARNING: chunkSize 100 because for 1000 (default chunkSize everywhere else in benchmark) it still broke
     const chunkSize = 100;
     const countInDb = await this.prismaService.orders.count();
     const expectedChunks = Math.ceil(countInDb / chunkSize);

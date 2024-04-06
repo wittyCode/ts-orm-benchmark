@@ -27,7 +27,13 @@ export class PrismaMarketingCampaignRepository
 
   async linkMarketingCampaignsToCustomers(
     marketingCampaignsToCustomer: MarketingCampaignToCustomer[],
-  ): Promise<void> {}
+  ): Promise<void> {
+    console.log(marketingCampaignsToCustomer.length);
+    // FIXME: currently these are not persisted, check after customer persistence was implemented to see if that's the issue
+    this.prismaService.marketing_campaigns_on_customers.createMany({
+      data: marketingCampaignsToCustomer,
+    });
+  }
 
   async upsertManyMarketingCampaigns(
     marketingCampaigns: MarketingCampaignEntity[],

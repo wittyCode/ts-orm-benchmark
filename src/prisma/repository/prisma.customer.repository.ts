@@ -10,51 +10,19 @@ export class PrismaCustomerRepository implements CustomerRepository {
     private readonly prismaService: PrismaService,
     private readonly loggerService: LoggerService,
   ) {}
-  upsertCustomer(customer: CustomerEntity): Promise<CustomerEntity> {
-    throw new Error('Method not implemented.');
+  async upsertCustomer(customer: CustomerEntity): Promise<CustomerEntity> {
+    return await this.prismaService.customers.upsert({
+      where: { id: customer.id },
+      // we don't want to insert children so we have to add empty objects to conform to prisma's interface
+      create: { ...customer, orders: {}, bills: {} },
+      update: { ...customer, orders: {}, bills: {} },
+    });
   }
-  upsertCustomerWithChildren(customer: CustomerEntity): Promise<void> {
+  async upsertCustomerWithChildren(customer: CustomerEntity): Promise<void> {
     throw new Error('Method not implemented.');
   }
 
-  async upsertManyCustomers(customers: CustomerEntity[]): Promise<void> {
-    // TODO: benchmarking and batching as in drizzle => this currently is just a simple for loop
-    let iteration = 0;
-    //for (const customer of customers) {
-    //await this.prismaService.customers.upsert({
-    //  where: { id: customer.id },
-    //  create: {
-    //    status: customer.status,
-    //    ...customer,
-    //    customersAddress: {
-    //      connectOrCreate: {
-    //        create: { ...customer.address },
-    //        where: {
-    //          customerId: customer.id,
-    //          id: customer.id,
-    //        },
-    //      },
-    //    },
-    //  },
-    //  update: {
-    //    ...customer,
-    //    customersAddress: {
-    //      connectOrCreate: {
-    //        create: { ...customer.address },
-    //        where: {
-    //          id: customer.id,
-    //        },
-    //      },
-    //    },
-    //  },
-    //});
-    //if (iteration % 100 === 0) {
-    //  // TODO find out how to acccess "this" here
-    //  console.log(`inserting batch ${iteration / 100}`);
-    //}
-    //iteration++;
-    //}
-  }
+  async upsertManyCustomers(customers: CustomerEntity[]): Promise<void> {}
 
   async findAll(): Promise<CustomerEntity[]> {
     const chunkSize = 1000;
