@@ -6,9 +6,10 @@ To learn typescript, and NestJS by doing, I was looking for a project to impleme
 
 I started with Drizzle since there seemed to be a lot of hype around it's performance and simplicity.
 
-Ideally this will enable people to checkout the repo to their machine, configure the database driver they want to be setup against their local or remote database (first step obviously PostgreSQL since supporting multiple drivers will be more work and I want to finish the different ORMs first)
+Ideally this will enable people to checkout the repo to their machine, configure the database driver they want to be setup against their local or remote database (first step being PostgreSQL since supporting multiple drivers will be more work and I want to finish the different ORMs first)
 
 The goal is not a benchmark with optimized ORM usage - but instead a benchmark with code implemented following tutorials and then applying code tidyings like extracting stuff into methods to improve readability. I do this since this is what I imagine most code to look like: a team learning a new framework/library and using it. When you're more experienced you'll probably be able to optimize - but this is not the scope of this benchmark.
+For this I try to balance the time I invest into learning the different frameworks and trying to figure out problems from the documentation and available resources. If a problem COULD be solved with very high effort or with complicating the code too much, I'll probably take the performance hit.
 
 In the long run I want to compare the following libraries, some because they are popular, some because they keep popping up on my radar:
 
@@ -20,7 +21,7 @@ The idea for this project stemmed from the fact that I could not find a relevant
 I found a theoretically very good benchmark for this in this [repository](https://github.com/emanuelcasco/typescript-orm-benchmark) by Emanuel Casco. The problem here is, that the last update was 4 years ago - in the meantime new frameworks showed up and others got significant updates.
 So building on inspiration from the methodology and comparisons there, I decided to start fresh.
 
-TODO shout out to tutorial creators as well, for Drizzle SakuraDev on youtube (api a bit outdated but concepts still hold true)
+Also a lot of this would not have been possible without resources out there to provide guidance on how to solve specific problems. For Drizzle, ["SakuraDev"](https://www.youtube.com/playlist?list=PLhnVDNT5zYN8PLdYddaU3jiZXeOyehhoU) has a great playlist explaining all concepts and showing implementation examples, which might be a little outdated by now but I was easily able to adapt the code to there current API where it was no longer as it is shown in the videos
 
 ## Methodology and Data used
 
@@ -34,6 +35,7 @@ To be able to compare the different libraries, we will use the following assumpt
 6. We're interested in insertion performance, performance of selecting big datasets and of updating selected columns for big datasets in bulk
 7. A report-like query to test how joining multiple tables and grouping performs is in place
 8. All data can be easily deleted to also be able to measure bulk deletions
+9. Measuring will mean running the benchmark multiple times to get a large enough sample size
 
 A simple synthetic use-case to achieve our goals is the following:
 
@@ -68,8 +70,7 @@ Install your dependencies with
 pnpm install
 ```
 
-You can run either only a postgres db to connect to or a compose setup with a db and dockerized app (
-see [Dockerfile](docker/Dockerfile-ts-orm-benchmark) for application container contents)
+You can run either only a postgres db to connect to or a compose setup with a db and dockerized app ( see [Dockerfile](docker/Dockerfile-ts-orm-benchmark) for application container contents)
 
 After your container is up and running, run
 
@@ -98,7 +99,7 @@ a lot.
 by order of current priority (subject to change):
 
 1. improve documentation about intent, methodology and configuration
-2. add Prisma implementation of repositories for first real comparison of performance
+2. do a first comparison of performance between drizzle and prisma now that implementation is done
 3. add count as field for the report join query to check how easy aggregation and projection can be combined (in prisma it seems to just be adding _count https://www.prisma.io/docs/orm/prisma-client/queries/relation-queries#relation-count)
 3. Check and compare with Prisma experimental feature that actually joins data correctly
 4. implement parallelism to be able to simulate multiple clients accessing the db at the same time, at least for READ queries, since that is a more realistic use-case than heavy inserts/updates at the same time - later also parallel inserts can be included

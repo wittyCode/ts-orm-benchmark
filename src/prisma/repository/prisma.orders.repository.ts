@@ -10,6 +10,7 @@ import { ConfigService } from '@nestjs/config';
 import { BenchmarkMetricsService } from '../../benchmark-metrics/service/benchmark-metrics.service';
 import { LoggerService } from '../../logger/logger.service';
 import { orderChunkSizeKey } from '../../config.constants';
+import { faker } from '@faker-js/faker';
 
 @Injectable()
 export class PrismaOrdersRepository implements OrdersRepository {
@@ -18,12 +19,52 @@ export class PrismaOrdersRepository implements OrdersRepository {
     private readonly configService: ConfigService,
     private readonly benchmarkMetricsService: BenchmarkMetricsService,
     private readonly loggerService: LoggerService,
-  ) {}
+  ) { }
 
   async updateOrderedPartWithBillId(
     orderedPartsEntities: OrderedPartEntity[],
     bills: BillEntity[],
-  ): Promise<void> {}
+  ) {
+    this.loggerService.log('Updating OrderedPart Entities');
+    const chunkSize = 1000;
+    const billIds = bills.map((it) => it.id);
+    orderedPartsEntities.forEach(
+      (it) => (it.billId = faker.helpers.arrayElement(billIds)),
+    );
+
+    const expectedChunks =
+      orderedPartsEntities.length >= chunkSize
+        ? Math.ceil(orderedPartsEntities.length / chunkSize)
+        : orderedPartsEntities.length;
+    this.loggerService.log(
+      `Expecting orderpart ${expectedChunks} chunks with size ${chunkSize}`,
+    );
+
+    for (let i = 0; i < orderedPartsEntities.length; i += chunkSize) {
+      const chunk = orderedPartsEntities.slice(i, i + chunkSize);
+      await benchmark(
+        `PRISMA: update ordered part data chunk of size ${chunkSize} with billIds`,
+        this.executeChunkUpdateOfOrderedParts.bind(this),
+        this.benchmarkMetricsService.resultMap,
+        chunk,
+      );
+      this.loggerService.log(
+        `order chunk ${i / chunkSize + 1} of ${expectedChunks} done!`,
+      );
+    }
+  }
+
+  private executeChunkUpdateOfOrderedParts(chunk: OrderedPartEntity[]) {
+    // WARNING: like drizzle prisma does not support dynamic updates of many entities in one transaction
+    // unlike drizzle, the way I found how it would be possible looks horribly complicated, so I guess here I'll just loop and take the performance hit?
+    // maybe when I find the motivation I'll change this
+    Promise.all(
+      chunk.map(async (item) => await this.prismaService.ordered_parts.update({
+        where: { id: item.id },
+        data: { billId: item.billId },
+      }))
+    );
+  }
 
   async insertManyOrdersFromCustomersAsChunks(
     customers: CustomerEntity[],
@@ -107,8 +148,7 @@ export class PrismaOrdersRepository implements OrdersRepository {
     const result = [];
     for (let i = 0; i <= countInDb; i += chunkSize) {
       console.log(
-        `Prisma reading order chunk ${
-          Math.ceil(i / chunkSize) + 1
+        `Prisma reading order chunk ${Math.ceil(i / chunkSize) + 1
         } of ${expectedChunks}`,
       );
       result.push(
