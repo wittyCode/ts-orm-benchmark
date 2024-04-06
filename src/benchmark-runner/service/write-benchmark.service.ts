@@ -17,12 +17,11 @@ export class WriteBenchmarkService {
     private readonly benchmarkService: BenchmarkMetricsService,
     private readonly loggerService: LoggerService,
     private readonly configService: ConfigService,
-  ) {}
+  ) { }
 
   async resetBenchmark(
     repositories: BenchmarkInputRepositoryDelegate,
   ): Promise<void> {
-    this.loggerService.log('Resetting benchmark');
     await repositories.marketingCampaignsRepository.drop();
     // FK cascading deletes will delete addresses, orders as well
     await repositories.customerRepository.drop();
