@@ -100,10 +100,11 @@ by order of current priority (subject to change):
 
 1. improve documentation about intent, methodology and configuration
 2. do a first comparison of performance between drizzle and prisma now that implementation is done
-3. add count as field for the report join query to check how easy aggregation and projection can be combined (in prisma it seems to just be adding _count https://www.prisma.io/docs/orm/prisma-client/queries/relation-queries#relation-count)
-3. Check and compare with Prisma experimental feature that actually joins data correctly
-4. implement parallelism to be able to simulate multiple clients accessing the db at the same time, at least for READ queries, since that is a more realistic use-case than heavy inserts/updates at the same time - later also parallel inserts can be included
-5. updated_at_utc update trigger in drizzle
+3. change resetting benchmark from resetting everything to either dropping DB or resetting metrics
+4. add count as field for the report join query to check how easy aggregation and projection can be combined (in prisma it seems to just be adding _count https://www.prisma.io/docs/orm/prisma-client/queries/relation-queries#relation-count)
+5. Check and compare with Prisma experimental feature that actually joins data correctly
+6. implement parallelism to be able to simulate multiple clients accessing the db at the same time, at least for READ queries, since that is a more realistic use-case than heavy inserts/updates at the same time - later also parallel inserts can be included
+7. updated_at_utc update trigger in drizzle
 
 unordered:
 
@@ -113,6 +114,7 @@ unordered:
 - add Frontend to actually look at results - this will be a fun project to dive into React, Vite and tailwind-css
 - support the following ORMs and query builders:
 - centralize the environment configs for database drivers
+- split different benchmark functions into separate benchmarks to look into specific things
 
   typeorm,
   sequelize

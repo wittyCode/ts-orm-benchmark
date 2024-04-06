@@ -40,7 +40,6 @@ export class DrizzleCustomerRepository implements CustomerRepository {
     // WARNING: there seems to be an issue with big transaction sizes / many inserts, for 10_000 records it just breaks with
     // bind message has 4464 parameters but 0 parameters or something like that
     // or with "Maximum call stack size exceeded" error, so we use chunks (better transaction-wise anyway)
-    // TODO: think if this can be parallelized with Promise.all
     const chunkSize =
       parseInt(this.configService.get<string>(customerChunkSizeKey)) || 1000;
     const expectedChunks = Math.ceil(customers.length / chunkSize);

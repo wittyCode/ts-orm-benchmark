@@ -19,7 +19,7 @@ export class PrismaOrdersRepository implements OrdersRepository {
     private readonly configService: ConfigService,
     private readonly benchmarkMetricsService: BenchmarkMetricsService,
     private readonly loggerService: LoggerService,
-  ) { }
+  ) {}
 
   async updateOrderedPartWithBillId(
     orderedPartsEntities: OrderedPartEntity[],
@@ -59,13 +59,17 @@ export class PrismaOrdersRepository implements OrdersRepository {
     // unlike drizzle, the way I found how it would be possible looks horribly complicated, so I guess here I'll just loop and take the performance hit?
     // maybe when I find the motivation I'll change this
     Promise.all(
-      chunk.map(async (item) => await this.prismaService.ordered_parts.update({
-        where: { id: item.id },
-        data: { billId: item.billId },
-      }))
+      chunk.map(
+        async (item) =>
+          await this.prismaService.ordered_parts.update({
+            where: { id: item.id },
+            data: { billId: item.billId },
+          }),
+      ),
     );
   }
 
+  // FIXME: even though we chunk, Prisma runs into heap out of memory error for 10000 customers (and accordingly more orders) - weird that no GC happens, with drizzle this works easily
   async insertManyOrdersFromCustomersAsChunks(
     customers: CustomerEntity[],
   ): Promise<void> {
@@ -148,7 +152,8 @@ export class PrismaOrdersRepository implements OrdersRepository {
     const result = [];
     for (let i = 0; i <= countInDb; i += chunkSize) {
       console.log(
-        `Prisma reading order chunk ${Math.ceil(i / chunkSize) + 1
+        `Prisma reading order chunk ${
+          Math.ceil(i / chunkSize) + 1
         } of ${expectedChunks}`,
       );
       result.push(

@@ -8,7 +8,7 @@ export class BillsFakerService {
   createMockEntities(amount: number, customerIds: string[]) {
     const result: BillEntity[] = [];
     console.log('given amount', amount);
-    for (let i = 0; i <= amount; i++) {
+    for (let i = 0; i < amount; i++) {
       const customerId = faker.helpers.arrayElement(customerIds);
       const entity = this.createMock(customerId);
       result.push(entity);
