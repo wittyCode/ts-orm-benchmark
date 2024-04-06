@@ -4,7 +4,7 @@ import { OrderEntity } from '../model/order.entity';
 import { OrderedPartEntity } from '../model/ordered-part.entity';
 
 export interface OrdersRepository {
-  upsertManyOrdersFromCustomersAsChunks(
+  insertManyOrdersFromCustomersAsChunks(
     customers: CustomerEntity[],
   ): Promise<void>;
   updateOrderedPartWithBillId(

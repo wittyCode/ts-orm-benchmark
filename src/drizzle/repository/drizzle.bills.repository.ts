@@ -15,7 +15,7 @@ export class DrizzleBillsRepository implements BillsRepository {
     private readonly benchmarkMetricsService: BenchmarkMetricsService,
   ) {}
 
-  async upsertManyBills(bills: BillEntity[]): Promise<void> {
+  async insertManyBills(bills: BillEntity[]): Promise<void> {
     // WARNING: there seems to be an issue with big transaction sizes / many inserts, for 10_000 records it just breaks with
     // bind message has 4464 parameters but 0 parameters or something like that
     // or with "Maximum call stack size exceeded" error
@@ -26,7 +26,7 @@ export class DrizzleBillsRepository implements BillsRepository {
       const chunk = bills.slice(i, i + chunkSize);
       await benchmark(
         'DRIZZLE: insert bill chunks',
-        this.upsertManyChunks.bind(this),
+        this.insertManyChunks.bind(this),
         this.benchmarkMetricsService.resultMap,
         chunk,
       );
@@ -34,7 +34,7 @@ export class DrizzleBillsRepository implements BillsRepository {
     }
   }
 
-  private async upsertManyChunks(bills: BillEntity[]): Promise<void> {
+  private async insertManyChunks(bills: BillEntity[]): Promise<void> {
     await this.drizzle.insert(billSchema.bills).values(bills).execute();
   }
 

@@ -29,13 +29,13 @@ export class PrismaMarketingCampaignRepository
     marketingCampaignsToCustomer: MarketingCampaignToCustomer[],
   ): Promise<void> {
     console.log(marketingCampaignsToCustomer.length);
-    // FIXME: currently these are not persisted, check after customer persistence was implemented to see if that's the issue
+    // FIXME: currently these are not persisted, implementing customer persistence did not fix the problem, check what's going on here
     this.prismaService.marketing_campaigns_on_customers.createMany({
       data: marketingCampaignsToCustomer,
     });
   }
 
-  async upsertManyMarketingCampaigns(
+  async insertManyMarketingCampaigns(
     marketingCampaigns: MarketingCampaignEntity[],
   ): Promise<void> {
     const chunkSize =
@@ -45,7 +45,7 @@ export class PrismaMarketingCampaignRepository
       const chunk = marketingCampaigns.slice(i, i + chunkSize);
       await benchmark(
         'PRISMA: insert marketing campaign chunks',
-        this.upsertManyChunks.bind(this),
+        this.insertManyChunks.bind(this),
         this.benchmarkMetricsService.resultMap,
         chunk,
       );
@@ -53,7 +53,7 @@ export class PrismaMarketingCampaignRepository
     }
   }
 
-  private async upsertManyChunks(
+  private async insertManyChunks(
     marketingCampaigns: MarketingCampaignEntity[],
   ): Promise<void> {
     await this.prismaService.marketing_campaigns.createMany({

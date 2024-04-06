@@ -12,6 +12,8 @@ import { ConfigService } from '@nestjs/config';
 import { customerAddress } from '../schema/address';
 import { customers } from '../schema/customers';
 import { CustomerRepository } from '../../benchmark-data/repository/customer.repository';
+import { customerChunkSizeKey } from '../../config.constants';
+import { LoggerService } from '../../logger/logger.service';
 
 @Injectable()
 export class DrizzleCustomerRepository implements CustomerRepository {
@@ -20,6 +22,7 @@ export class DrizzleCustomerRepository implements CustomerRepository {
     private readonly drizzle: NodePgDatabase<typeof customersSchema>,
     private readonly benchmarkService: BenchmarkMetricsService,
     private readonly configService: ConfigService,
+    private readonly loggerService: LoggerService,
   ) {}
 
   async upsertCustomer(customer: CustomerEntity): Promise<CustomerEntity> {
@@ -33,30 +36,32 @@ export class DrizzleCustomerRepository implements CustomerRepository {
       .returning()[0]) as Promise<CustomerEntity>;
   }
 
-  async upsertManyCustomers(customers: CustomerEntity[]): Promise<void> {
+  async insertManyCustomers(customers: CustomerEntity[]): Promise<void> {
     // WARNING: there seems to be an issue with big transaction sizes / many inserts, for 10_000 records it just breaks with
     // bind message has 4464 parameters but 0 parameters or something like that
     // or with "Maximum call stack size exceeded" error, so we use chunks (better transaction-wise anyway)
     // TODO: think if this can be parallelized with Promise.all
     const chunkSize =
-      parseInt(this.configService.get<string>('CUSTOMER_CHUNK_SIZE')) || 1000;
+      parseInt(this.configService.get<string>(customerChunkSizeKey)) || 1000;
     const expectedChunks = Math.ceil(customers.length / chunkSize);
-    console.log(`Expecting ${expectedChunks} chunks of size ${chunkSize}`);
+    this.loggerService.log(
+      `Expecting ${expectedChunks} customer chunks of size ${chunkSize}`,
+    );
     for (let i = 0; i < customers.length; i += chunkSize) {
       const chunk = customers.slice(i, i + chunkSize);
       await benchmark(
         'DRIZZLE: insert customer chunks with addresses',
-        this.upsertManyWithChildren.bind(this),
+        this.insertManyWithChildren.bind(this),
         this.benchmarkService.resultMap,
         chunk,
       );
-      console.log(`chunk ${i / chunkSize + 1} of ${expectedChunks} done!`);
+      this.loggerService.log(
+        `customer chunk ${i / chunkSize + 1} of ${expectedChunks} done!`,
+      );
     }
   }
 
-  // TODO: technically this right now only is "insert" and not "upsert"
-  // because it doesn't update the existing records
-  private async upsertManyWithChildren(customerEntities: CustomerEntity[]) {
+  private async insertManyWithChildren(customerEntities: CustomerEntity[]) {
     await this.drizzle.transaction(async (tx) => {
       await tx
         .insert(customers)

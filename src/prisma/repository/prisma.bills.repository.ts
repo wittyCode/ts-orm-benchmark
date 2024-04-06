@@ -12,14 +12,14 @@ export class PrismaBillsRepository implements BillsRepository {
     private readonly benchmarkMetricsService: BenchmarkMetricsService,
   ) {}
 
-  async upsertManyBills(bills: BillEntity[]): Promise<void> {
+  async insertManyBills(bills: BillEntity[]): Promise<void> {
     const chunkSize = 1000;
     const expectedChunks = Math.ceil(bills.length / chunkSize);
     for (let i = 0; i < bills.length; i += chunkSize) {
       const chunk = bills.slice(i, i + chunkSize);
       await benchmark(
         'PRISMA: insert bill chunks',
-        this.upsertManyChunks.bind(this),
+        this.insertManyChunks.bind(this),
         this.benchmarkMetricsService.resultMap,
         chunk,
       );
@@ -27,7 +27,7 @@ export class PrismaBillsRepository implements BillsRepository {
     }
   }
 
-  private async upsertManyChunks(bills: BillEntity[]): Promise<void> {
+  private async insertManyChunks(bills: BillEntity[]): Promise<void> {
     await this.prismaService.bills.createMany({
       data: bills,
     });

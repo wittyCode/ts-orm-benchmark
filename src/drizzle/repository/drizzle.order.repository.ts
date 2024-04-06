@@ -25,7 +25,7 @@ export class DrizzleOrderRepository implements OrdersRepository {
     private readonly loggerService: LoggerService,
   ) {}
 
-  async upsertManyOrdersFromCustomersAsChunks(
+  async insertManyOrdersFromCustomersAsChunks(
     customers: CustomerEntity[],
   ): Promise<void> {
     const orders = customers
@@ -45,7 +45,7 @@ export class DrizzleOrderRepository implements OrdersRepository {
       const chunk = orders.slice(i, i + chunkSize);
       await benchmark(
         `DRIZZLE: insert order Chunk of size ${chunkSize} with ordered parts data`,
-        this.upsertMany.bind(this),
+        this.insertMany.bind(this),
         this.benchmarkService.resultMap,
         chunk,
       );
@@ -53,9 +53,7 @@ export class DrizzleOrderRepository implements OrdersRepository {
     }
   }
 
-  // TODO: technically this right currently only is "insert" and not "upsert"
-  // because it doesn't update the existing records => see comment at update of orderedparts for idea of bulk updates
-  private async upsertMany(orders: OrderEntity[]) {
+  private async insertMany(orders: OrderEntity[]) {
     const orderedPartsEntities = orders
       .map(this.mapOrderedPart)
       .reduce((acc, val) => acc.concat(val.orderedParts), []);

@@ -10,7 +10,7 @@ export interface MarketingCampaignsRepository {
   linkMarketingCampaignsToCustomers(
     marketingCampaignsToCustomer: MarketingCampaignToCustomer[],
   ): Promise<void>;
-  upsertManyMarketingCampaigns(
+  insertManyMarketingCampaigns(
     marketingCampaigns: MarketingCampaignEntity[],
   ): Promise<void>;
   findAll(): Promise<MarketingCampaignEntity[]>;

@@ -10,7 +10,7 @@ import { PrismaService } from '../prisma.service';
 export class PrismaOrdersRepository implements OrdersRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async upsertManyOrdersFromCustomersAsChunks(
+  async insertManyOrdersFromCustomersAsChunks(
     customers: CustomerEntity[],
   ): Promise<void> {}
 

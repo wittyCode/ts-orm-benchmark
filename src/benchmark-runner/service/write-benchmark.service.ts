@@ -17,7 +17,7 @@ export class WriteBenchmarkService {
     private readonly benchmarkService: BenchmarkMetricsService,
     private readonly loggerService: LoggerService,
     private readonly configService: ConfigService,
-  ) { }
+  ) {}
 
   async resetBenchmark(
     repositories: BenchmarkInputRepositoryDelegate,
@@ -29,7 +29,6 @@ export class WriteBenchmarkService {
     this.benchmarkService.resultMap.clear();
   }
 
-  // TODO: add dbDriver as param to add it as Key to result map entry
   async runWriteBenchmark(
     repositories: BenchmarkInputRepositoryDelegate,
     customerSize: number,
@@ -109,7 +108,7 @@ export class WriteBenchmarkService {
     this.loggerService.log('Inserting customers');
     await benchmark(
       `${benchmarkType} insertAllCustomers`,
-      repositories.customerRepository.upsertManyCustomers.bind(
+      repositories.customerRepository.insertManyCustomers.bind(
         repositories.customerRepository,
       ),
       this.benchmarkService.resultMap,
@@ -120,7 +119,7 @@ export class WriteBenchmarkService {
     this.loggerService.log('Inserting orders');
     await benchmark(
       `${benchmarkType} insertAllOrders`,
-      repositories.ordersRepository.upsertManyOrdersFromCustomersAsChunks.bind(
+      repositories.ordersRepository.insertManyOrdersFromCustomersAsChunks.bind(
         repositories.ordersRepository,
       ),
       this.benchmarkService.resultMap,
@@ -131,7 +130,7 @@ export class WriteBenchmarkService {
     this.loggerService.log('Inserting bills');
     await benchmark(
       `${benchmarkType} insertAllBills`,
-      repositories.billsRepository.upsertManyBills.bind(
+      repositories.billsRepository.insertManyBills.bind(
         repositories.billsRepository,
       ),
       this.benchmarkService.resultMap,
@@ -155,7 +154,7 @@ export class WriteBenchmarkService {
     this.loggerService.log('Inserting marketing campaigns');
     await benchmark(
       `${benchmarkType} insertAllMarketingCampaigns`,
-      repositories.marketingCampaignsRepository.upsertManyMarketingCampaigns.bind(
+      repositories.marketingCampaignsRepository.insertManyMarketingCampaigns.bind(
         repositories.marketingCampaignsRepository,
       ),
       this.benchmarkService.resultMap,

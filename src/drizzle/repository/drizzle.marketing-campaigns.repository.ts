@@ -29,7 +29,7 @@ export class DrizzleMarketingCampaignsRepository
     private readonly configService: ConfigService,
   ) {}
 
-  async upsertManyMarketingCampaigns(
+  async insertManyMarketingCampaigns(
     marketingCampaigns: MarketingCampaignEntity[],
   ): Promise<void> {
     // WARNING: there seems to be an issue with big transaction sizes / many inserts, for 10_000 records it just breaks with
@@ -42,7 +42,7 @@ export class DrizzleMarketingCampaignsRepository
       const chunk = marketingCampaigns.slice(i, i + chunkSize);
       await benchmark(
         'DRIZZLE: insert marketing campaign chunks',
-        this.upsertManyChunks.bind(this),
+        this.insertManyChunks.bind(this),
         this.benchmarkMetricsService.resultMap,
         chunk,
       );
@@ -50,7 +50,7 @@ export class DrizzleMarketingCampaignsRepository
     }
   }
 
-  private async upsertManyChunks(
+  private async insertManyChunks(
     marketingCampaigns: MarketingCampaignEntity[],
   ): Promise<void> {
     await this.drizzle
