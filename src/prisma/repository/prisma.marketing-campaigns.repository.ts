@@ -28,9 +28,28 @@ export class PrismaMarketingCampaignRepository
   async linkMarketingCampaignsToCustomers(
     marketingCampaignsToCustomer: MarketingCampaignToCustomer[],
   ): Promise<void> {
-    console.log(marketingCampaignsToCustomer.length);
-    // FIXME: currently these are not persisted, implementing customer persistence did not fix the problem, check what's going on here
-    this.prismaService.marketing_campaigns_on_customers.createMany({
+    const chunkSize =
+      parseInt(this.configService.get<string>(campaignChunkSizeKey)) || 1000;
+    const expectedChunks = Math.ceil(
+      marketingCampaignsToCustomer.length / chunkSize,
+    );
+    for (let i = 0; i < marketingCampaignsToCustomer.length; i += chunkSize) {
+      const chunk = marketingCampaignsToCustomer.slice(i, i + chunkSize);
+      await benchmark(
+        'DRIZZLE: insert marketing campaigns to customer relation chunks',
+        this.linkChunksOfMarketingCampaignsToCusomters.bind(this),
+        this.benchmarkMetricsService.resultMap,
+        chunk,
+      );
+      console.log(`chunk ${i / chunkSize + 1} of ${expectedChunks} done!`);
+    }
+  }
+
+  private async linkChunksOfMarketingCampaignsToCusomters(
+    marketingCampaignsToCustomer: MarketingCampaignToCustomer[],
+  ) {
+    // without await this did not work - I honestly currently don't understand why
+    await this.prismaService.marketing_campaigns_on_customers.createMany({
       data: marketingCampaignsToCustomer,
     });
   }

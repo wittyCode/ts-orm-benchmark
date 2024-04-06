@@ -9,8 +9,7 @@ import { MarketingCampaignToCustomer } from '../../benchmark-data/repository/mar
 export class MarketingCampaignFakerService {
   constructor() {}
 
-  createMockMarketingCampaigns(maxAmount: number): MarketingCampaignEntity[] {
-    const amount = faker.number.int({ min: 1, max: maxAmount });
+  createMockMarketingCampaigns(amount: number): MarketingCampaignEntity[] {
     const result: MarketingCampaignEntity[] = [];
     for (let i = 0; i < amount; i++) {
       result.push(this.createRandomMarketingCampaign());

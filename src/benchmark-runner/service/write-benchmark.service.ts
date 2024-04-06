@@ -89,7 +89,7 @@ export class WriteBenchmarkService {
       orderCount +
       orderedPartsFlatCount +
       billEntities.length +
-      marketingCampaignCount +
+      marketingCampaignEntities.length +
       customersPerCampaignEntities.length;
 
     this.loggerService.log(
@@ -99,7 +99,7 @@ export class WriteBenchmarkService {
       ${orderCount} order entities created!
       ${orderedPartsFlatCount} ordered part data entries created!
       ${billEntities.length} bill entities created!
-      ${marketingCampaignCount} marketing campaign entities created!
+      ${marketingCampaignEntities.length} marketing campaign entities created!
       ${customersPerCampaignEntities.length} joinTable entities between customers and marketingCampaigns created!
       `,
     );
