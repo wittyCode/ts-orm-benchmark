@@ -14,6 +14,7 @@ import { LoggerService } from '../../logger/logger.service';
 import { OrderedPartEntity } from '../../benchmark-data/model/ordered-part.entity';
 import { BillEntity } from '../../benchmark-data/model/bill.entity';
 import { OrdersRepository } from '../../benchmark-data/repository/orders.repository';
+import { customerChunkSizeKey } from '../../config.constants';
 
 @Injectable()
 export class DrizzleOrderRepository implements OrdersRepository {
@@ -31,16 +32,18 @@ export class DrizzleOrderRepository implements OrdersRepository {
     const orders = customers
       .map(this.mapCustomersOrders)
       .reduce((acc, val) => acc.concat(val.orders), []);
-    console.log(
+    this.loggerService.log(
       `Inserting ${orders.length} orders from ${customers.length} customers`,
     );
     const chunkSize =
-      parseInt(this.configService.get<string>('ORDER_CHUNK_SIZE')) || 100;
+      parseInt(this.configService.get<string>(customerChunkSizeKey)) || 100;
     const expectedChunks =
       orders.length >= chunkSize
         ? Math.ceil(orders.length / chunkSize)
         : orders.length;
-    console.log(`Expecting ${expectedChunks} chunks with size ${chunkSize}`);
+    this.loggerService.log(
+      `Expecting ${expectedChunks} chunks with size ${chunkSize}`,
+    );
     for (let i = 0; i < orders.length; i += chunkSize) {
       const chunk = orders.slice(i, i + chunkSize);
       await benchmark(
@@ -49,7 +52,9 @@ export class DrizzleOrderRepository implements OrdersRepository {
         this.benchmarkService.resultMap,
         chunk,
       );
-      console.log(`chunk ${i / chunkSize + 1} of ${expectedChunks} done!`);
+      this.loggerService.log(
+        `chunk ${i / chunkSize + 1} of ${expectedChunks} done!`,
+      );
     }
   }
 
@@ -98,7 +103,9 @@ export class DrizzleOrderRepository implements OrdersRepository {
       orderedPartsEntities.length >= chunkSize
         ? Math.ceil(orderedPartsEntities.length / chunkSize)
         : orderedPartsEntities.length;
-    console.log(`Expecting ${expectedChunks} chunks with size ${chunkSize}`);
+    this.loggerService.log(
+      `Expecting orderpart ${expectedChunks} chunks with size ${chunkSize}`,
+    );
 
     for (let i = 0; i < orderedPartsEntities.length; i += chunkSize) {
       const chunk = orderedPartsEntities.slice(i, i + chunkSize);
@@ -124,7 +131,9 @@ export class DrizzleOrderRepository implements OrdersRepository {
         this.benchmarkService.resultMap,
         chunk,
       );
-      console.log(`chunk ${i / chunkSize + 1} of ${expectedChunks} done!`);
+      this.loggerService.log(
+        `order chunk ${i / chunkSize + 1} of ${expectedChunks} done!`,
+      );
     }
   }
 
