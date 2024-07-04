@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { v4 as uuid } from 'uuid';
 import { faker } from '@faker-js/faker';
-import { BillEntity } from '../../benchmark-data/model/bill.entity';
+import { BillEntity } from '@/benchmark-data/model/bill.entity';
 
 @Injectable()
 export class BillsFakerService {
