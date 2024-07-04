@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { CustomerFakerService } from './customer-faker.service';
-import { benchmark } from '../../benchmark-metrics/util/benchmark.helper';
-import { CustomerEntity } from '../../benchmark-data/model/customer.entity';
-import { LoggerService } from '../../logger/logger.service';
-import { BenchmarkMetricsService } from '../../benchmark-metrics/service/benchmark-metrics.service';
-import { BillEntity } from '../../benchmark-data/model/bill.entity';
+import { benchmark } from '@/benchmark-metrics/util/benchmark.helper';
+import { CustomerEntity } from '@/benchmark-data/model/customer.entity';
+import { LoggerService } from '@/logger/logger.service';
+import { BenchmarkMetricsService } from '@/benchmark-metrics/service/benchmark-metrics.service';
+import { BillEntity } from '@/benchmark-data/model/bill.entity';
 import { BillsFakerService } from './bills-faker.service';
-import { MarketingCampaignEntity } from '../../benchmark-data/model/marketing-campaign.entity';
+import { MarketingCampaignEntity } from '@/benchmark-data/model/marketing-campaign.entity';
 import { MarketingCampaignFakerService } from './marketing-campaign-faker.service';
-import { MarketingCampaignToCustomer } from '../../benchmark-data/repository/marketing-campaigns.repository';
+import { MarketingCampaignToCustomer } from '@/benchmark-data/repository/marketing-campaigns.repository';
 
 @Injectable()
 export class CreateMockService {
